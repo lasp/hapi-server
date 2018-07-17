@@ -16,3 +16,15 @@ $ docker run -p 8080:8080 <IMAGE ID>
 ```
 
 The endpoints will be available at `http://localhost:8080/`.
+
+## Running with an executable JAR
+
+The `assembly` SBT task will build an executable JAR.
+
+The run the JAR:
+
+```
+$ java -jar <JAR>
+```
+
+The endpoints will be available at `http://localhost:8080/`.
