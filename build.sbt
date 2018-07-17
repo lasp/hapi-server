@@ -1,10 +1,17 @@
 ThisBuild / organization := "lasp"
 ThisBuild / scalaVersion := "2.12.6"
 
+val http4sVersion = "0.18.15"
+
 lazy val `latis-hapi` = (project in file("."))
   .settings(compilerFlags)
   .settings(
-    name := "latis-hapi"
+    name := "latis-hapi",
+    libraryDependencies ++= Seq(
+      "org.http4s"    %% "http4s-blaze-server" % http4sVersion,
+      "org.http4s"    %% "http4s-dsl"          % http4sVersion,
+      "ch.qos.logback" % "logback-classic"     % "1.2.3" % Runtime
+    )
   )
 
 lazy val compilerFlags = Seq(
