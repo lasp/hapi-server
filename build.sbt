@@ -25,7 +25,7 @@ lazy val compilerFlags = Seq(
     "-unchecked",
     "-Xfatal-warnings",
     "-Xfuture",
-    "-Xlint",
+    "-Xlint:-unused,_",
     "-Ypartial-unification",
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
