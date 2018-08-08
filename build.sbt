@@ -39,6 +39,9 @@ lazy val compilerFlags = Seq(
 )
 
 lazy val dockerSettings = Seq(
+  docker / imageNames := {
+    Seq(ImageName(s"${organization.value}/${name.value}:${version.value}"))
+  },
   docker / dockerfile := {
     val jarFile = (Compile / packageBin / sbt.Keys.`package`).value
     val classpath = (Runtime / managedClasspath).value
