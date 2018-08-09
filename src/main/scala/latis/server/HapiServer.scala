@@ -16,7 +16,11 @@ import org.http4s.server.blaze._
  *
  * This is the entry point for the HAPI server.
  */
-object HapiServer extends HapiServerApp[IO]
+object HapiServer extends HapiServerApp[IO] {
+
+  /** Version of HAPI spec. */
+  val version: String = "2.0"
+}
 
 /** The HAPI server parameterized over the effect type. */
 abstract class HapiServerApp[F[_]: Effect] extends StreamApp[F] {
