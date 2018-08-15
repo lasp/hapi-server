@@ -1,5 +1,7 @@
 package latis.server
 
+import io.circe.Encoder
+
 /** Representation of a HAPI status code and message. */
 final case class Status(code: Int, message: String)
 
@@ -19,4 +21,10 @@ object Status {
   val `1410`: Status = Status(1410, "Bad request - unsupported include value")
   val `1500`: Status = Status(1500, "Internal server error")
   val `1501`: Status = Status(1501, "Internal server error - upstream request error")
+
+  /** JSON encoder */
+  implicit val encoder: Encoder[Status] =
+    Encoder.forProduct2("code", "message") { x =>
+      (x.code, x.message)
+    }
 }
