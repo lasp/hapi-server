@@ -2,20 +2,32 @@ package latis.server
 
 import cats.effect.Effect
 import cats.implicits._
+import io.circe.syntax._
 import org.http4s.HttpService
 import org.http4s.ParseFailure
 import org.http4s.QueryParamDecoder
 import org.http4s.QueryParameterValue
+import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.dsl.io._
 
 /** Implements the `/data` endpoint. */
 class DataService[F[_]: Effect] extends Http4sDsl[F] {
+  import QueryDecoders._
 
   val service: HttpService[F] =
     HttpService[F] {
-      case GET -> Root / "data" =>
+      case GET -> Root / "data"
+          :? IdMatcher(_)
+          +& MinTimeMatcher(_)
+          +& MaxTimeMatcher(_)
+          +& ParamMatcher(_)
+          +& IncludeMatcher(_)
+          +& FormatMatcher(_) =>
         Ok("Hello from HAPI!")
+      // Return a 1400 error if the required parameters are not given.
+      case GET -> Root / "data" :? _ =>
+        BadRequest(Status.`1400`.asJson)
     }
 }
 
