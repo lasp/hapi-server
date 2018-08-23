@@ -1,4 +1,4 @@
-package latis.server
+package lasp.hapi.service
 
 import org.http4s.QueryParameterValue
 import org.scalatest.FlatSpec

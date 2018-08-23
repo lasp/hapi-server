@@ -1,15 +1,23 @@
-package latis.server
+package lasp.hapi.server
 
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import cats.effect._
 import cats.implicits._
-import fs2.{Stream, StreamApp}
+import fs2.Stream
+import fs2.StreamApp
 import fs2.StreamApp.ExitCode
 import org.http4s._
-import org.http4s.server.middleware.{CORS, CORSConfig}
 import org.http4s.server.blaze._
+import org.http4s.server.middleware.CORS
+import org.http4s.server.middleware.CORSConfig
+
+import lasp.hapi.service.CapabilitiesService
+import lasp.hapi.service.CatalogService
+import lasp.hapi.service.DataService
+import lasp.hapi.service.HapiService
+import lasp.hapi.service.InfoService
 
 /**
  * The HAPI server in IO.

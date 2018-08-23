@@ -1,6 +1,6 @@
-# latis-hapi
+# LASP HAPI Server
 
-`latis-hapi` will enable [HAPI][hapi] capabilities in LaTiS.
+A [HAPI][hapi] server built on LaTiS.
 
 [hapi]: https://hapi-server.github.io/
 

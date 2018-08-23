@@ -1,4 +1,4 @@
-package latis.server
+package lasp.hapi.service
 
 import cats.effect.Effect
 import cats.implicits._
