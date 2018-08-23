@@ -3,12 +3,11 @@ ThisBuild / scalaVersion := "2.12.6"
 
 val http4sVersion = "0.18.15"
 
-lazy val `latis-hapi` = (project in file("."))
+lazy val `hapi-server` = (project in file("."))
   .enablePlugins(DockerPlugin)
   .settings(compilerFlags)
   .settings(dockerSettings)
   .settings(
-    name := "latis-hapi",
     libraryDependencies ++= Seq(
       "org.http4s"    %% "http4s-blaze-server" % http4sVersion,
       "org.http4s"    %% "http4s-circe"        % http4sVersion,

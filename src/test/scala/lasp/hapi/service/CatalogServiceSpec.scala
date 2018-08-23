@@ -1,4 +1,4 @@
-package latis.server
+package lasp.hapi.service
 
 import org.scalatest.FlatSpec
 
