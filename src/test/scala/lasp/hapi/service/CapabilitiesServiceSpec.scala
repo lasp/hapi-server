@@ -7,15 +7,13 @@ import org.http4s._
 import org.http4s.implicits._
 import org.scalatest.FlatSpec
 
-import lasp.hapi.server.HapiServer
-
 class CapabilitiesServiceSpec extends FlatSpec {
 
   "The capabilities service" should "advertise all output options" in {
-    val req = Request[IO](Method.GET, Uri.uri("/capabilities"))
+    val req = Request[IO](Method.GET, Uri.uri("/hapi/capabilities"))
 
     val expected = Json.obj(
-      ("HAPI", Json.fromString(HapiServer.version)),
+      ("HAPI", Json.fromString(HapiService.version)),
       ("status", Status.`1200`.asJson),
       ("outputFormats", Json.fromValues(
         List(

@@ -12,12 +12,12 @@ class InfoService[F[_]: Effect] extends Http4sDsl[F] {
 
   val service: HttpService[F] =
     HttpService[F] {
-      case GET -> Root / "info"
+      case GET -> Root / "hapi" / "info"
           :? IdMatcher(_)
           +& ParamMatcher(_) =>
         Ok("Hello from HAPI!")
       // Return a 1400 error if the required parameters are not given.
-      case GET -> Root / "info" :? _ =>
+      case GET -> Root / "hapi" / "info" :? _ =>
         BadRequest(Status.`1400`.asJson)
     }
 }
