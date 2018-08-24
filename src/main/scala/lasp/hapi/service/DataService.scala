@@ -14,7 +14,7 @@ class DataService[F[_]: Effect] extends Http4sDsl[F] {
 
   val service: HttpService[F] =
     HttpService[F] {
-      case GET -> Root / "data"
+      case GET -> Root / "hapi" / "data"
           :? IdMatcher(_)
           +& MinTimeMatcher(_)
           +& MaxTimeMatcher(_)
@@ -23,7 +23,7 @@ class DataService[F[_]: Effect] extends Http4sDsl[F] {
           +& FormatMatcher(_) =>
         Ok("Hello from HAPI!")
       // Return a 1400 error if the required parameters are not given.
-      case GET -> Root / "data" :? _ =>
+      case GET -> Root / "hapi" / "data" :? _ =>
         BadRequest(Status.`1400`.asJson)
     }
 }
