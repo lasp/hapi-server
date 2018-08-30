@@ -23,5 +23,5 @@ object Include {
       }
     }
 
-  object IncludeMatcher extends OptionalQueryParamDecoderMatcher[Include]("include")
+  object IncludeMatcher extends OptionalValidatingQueryParamDecoderMatcher[Include]("include")
 }

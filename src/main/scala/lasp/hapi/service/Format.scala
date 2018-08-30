@@ -23,5 +23,5 @@ object Format {
       }
     }
 
-  object FormatMatcher extends OptionalQueryParamDecoderMatcher[Format]("format")
+  object FormatMatcher extends OptionalValidatingQueryParamDecoderMatcher[Format]("format")
 }
