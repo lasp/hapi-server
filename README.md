@@ -21,7 +21,7 @@ The endpoints will be available at `http://localhost:8080/`.
 
 The `assembly` SBT task will build an executable JAR.
 
-The run the JAR:
+Then run the JAR:
 
 ```
 $ java -jar <JAR>
