@@ -21,8 +21,11 @@ import org.http4s.server.middleware.CORSConfig
  *  - `/hapi/catalog`
  *  - `/hapi/data`
  *  - `/hapi/info`
+ *
+ * @constructor Create a HAPI service with the given interpreter.
+ * @param interpreter interpreter for HAPI algebras
  */
-class HapiService[F[_]: Effect] {
+class HapiService[F[_]: Effect](interpreter: HapiInterpreter[F]) {
 
   private val corsConfig: CORSConfig = CORSConfig(
     anyOrigin        = true,
@@ -37,9 +40,9 @@ class HapiService[F[_]: Effect] {
   val service: HttpService[F] = {
     // If you see a red squiggly here it's probably a lie.
     val service = {
-      new CapabilitiesService[F].service <+>
-      new InfoService[F].service         <+>
-      new CatalogService[F].service      <+>
+      new CapabilitiesService[F].service         <+>
+      new InfoService[F].service                 <+>
+      new CatalogService[F](interpreter).service <+>
       new DataService[F].service
     }
     CORS(service, corsConfig)

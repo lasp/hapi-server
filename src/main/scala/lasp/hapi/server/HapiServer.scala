@@ -10,6 +10,7 @@ import fs2.StreamApp.ExitCode
 import org.http4s.HttpService
 import org.http4s.server.blaze._
 
+import lasp.hapi.service.HapiInterpreter
 import lasp.hapi.service.HapiService
 import lasp.hapi.service.LandingPageService
 
@@ -24,7 +25,7 @@ object HapiServer extends HapiServerApp[IO]
 abstract class HapiServerApp[F[_]: Effect] extends StreamApp[F] {
 
   private val hapiService: HttpService[F] =
-    new HapiService().service
+    new HapiService(HapiInterpreter.noopInterpreter[F]).service
 
   private val landingPage: HttpService[F] =
     new LandingPageService().service
