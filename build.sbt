@@ -5,6 +5,7 @@ val http4sVersion = "0.18.15"
 
 lazy val `hapi-server` = (project in file("."))
   .enablePlugins(DockerPlugin)
+  .dependsOn(latis2)
   .settings(compilerFlags)
   .settings(dockerSettings)
   .settings(
@@ -18,6 +19,11 @@ lazy val `hapi-server` = (project in file("."))
     ),
     Test / logBuffered := false
   )
+
+lazy val latis2 = ProjectRef(
+  uri("git://github.com/latis-data/latis.git#78e60aeb5387a047ceb99db56a1bd49786100904"),
+  "latis"
+)
 
 lazy val compilerFlags = Seq(
   scalacOptions ++= Seq(
