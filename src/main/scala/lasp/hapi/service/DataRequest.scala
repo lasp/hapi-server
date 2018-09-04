@@ -1,5 +1,7 @@
 package lasp.hapi.service
 
+import java.time.LocalDateTime
+
 /**
  * Represents a request for data.
  *
@@ -12,8 +14,8 @@ package lasp.hapi.service
  */
 final case class DataRequest(
   id: String,
-  minTime: String,
-  maxTime: String,
+  minTime: LocalDateTime,
+  maxTime: LocalDateTime,
   parameters: Option[List[String]],
   header: Boolean,
   format: String

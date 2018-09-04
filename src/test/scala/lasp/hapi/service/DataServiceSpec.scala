@@ -1,9 +1,60 @@
 package lasp.hapi.service
 
-import org.http4s.QueryParameterValue
+import cats.effect.IO
+import io.circe.syntax._
+import org.http4s._
+import org.http4s.implicits._
+import org.scalatest.Assertion
 import org.scalatest.FlatSpec
 
 class DataServiceSpec extends FlatSpec {
+
+  /** Assert GET request to given URI returns a particular status. */
+  def assertStatus(uri: Uri, status: Status): Assertion = {
+    val service = new DataService[IO].service
+    val req = Request[IO](Method.GET, uri)
+
+    val body = service.orNotFound(req).flatMap { res =>
+      res.bodyAsText.compile.toList.map(_.head)
+    }.unsafeRunSync
+
+    assert(body == status.asJson.noSpaces)
+  }
+
+  "The data service" should "return a 1402 for invalid start times" in {
+    assertStatus(
+      Uri.uri("/hapi/data?id=0&time.min=invalid&time.max=2018Z"),
+      Status.`1402`
+    )
+  }
+
+  it should "return a 1403 for invalid stop times" in {
+    assertStatus(
+      Uri.uri("/hapi/data?id=0&time.min=2018Z&time.max=invalid"),
+      Status.`1403`
+    )
+  }
+
+  it should "return a 1404 for misordered times" in {
+    assertStatus(
+      Uri.uri("/hapi/data?id=0&time.min=2018Z&time.max=2017Z"),
+      Status.`1404`
+    )
+  }
+
+  it should "return a 1409 for invalid formats" in {
+    assertStatus(
+      Uri.uri("/hapi/data?id=0&time.min=2017Z&time.max=2018Z&format=cats"),
+      Status.`1409`
+    )
+  }
+
+  it should "return a 1410 for invalid include settings" in {
+    assertStatus(
+      Uri.uri("/hapi/data?id=0&time.min=2017Z&time.max=2018Z&include=cats"),
+      Status.`1410`
+    )
+  }
 
   "The 'include' parameter" should "accept 'header'" in {
     val decoded = Include.includeDecoder.decode(QueryParameterValue("header"))
