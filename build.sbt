@@ -1,7 +1,7 @@
 ThisBuild / organization := "lasp"
 ThisBuild / scalaVersion := "2.12.6"
 
-val http4sVersion = "0.18.15"
+val http4sVersion = "0.18.17"
 
 lazy val `hapi-server` = (project in file("."))
   .enablePlugins(DockerPlugin)
@@ -13,8 +13,8 @@ lazy val `hapi-server` = (project in file("."))
       "org.http4s"    %% "http4s-blaze-server" % http4sVersion,
       "org.http4s"    %% "http4s-circe"        % http4sVersion,
       "org.http4s"    %% "http4s-dsl"          % http4sVersion,
+      "org.http4s"    %% "http4s-scalatags"    % http4sVersion,
       "ch.qos.logback" % "logback-classic"     % "1.2.3" % Runtime,
-      "com.lihaoyi"   %% "scalatags"           % "0.6.7",
       "org.scalatest" %% "scalatest"           % "3.0.5" % Test
     ),
     Test / logBuffered := false

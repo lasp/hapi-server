@@ -1,17 +1,15 @@
 package lasp.hapi.service
 
 import cats.effect.Effect
-import cats.implicits._
 import org.http4s.HttpService
-import org.http4s.MediaType.`text/html`
 import org.http4s.dsl.Http4sDsl
-import org.http4s.headers.`Content-Type`
+import org.http4s.scalatags._
 import scalatags.Text.all._
 
 /** Implements the HAPI landing page. */
 class LandingPageService[F[_]: Effect] extends Http4sDsl[F] {
 
-  val landingPage: Frag =
+  val landingPage =
     html(
       body(
         h1("LASP HAPI Server"),
@@ -43,8 +41,6 @@ class LandingPageService[F[_]: Effect] extends Http4sDsl[F] {
   val service: HttpService[F] =
     HttpService[F] {
       case GET -> Root / "hapi" =>
-        Ok(landingPage.render).map {
-          _.withContentType(`Content-Type`(`text/html`))
-        }
+        Ok(landingPage)
     }
 }
