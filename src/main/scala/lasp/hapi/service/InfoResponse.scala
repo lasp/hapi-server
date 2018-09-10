@@ -1,5 +1,6 @@
 package lasp.hapi.service
 
+import cats.data.NonEmptyList
 import io.circe.Encoder
 
 /**
@@ -26,7 +27,7 @@ final case class InfoResponse(
   version: String,
   status: Status,
   format: String,
-  parameters: List[Parameter],
+  parameters: NonEmptyList[Parameter],
   startDate: String,
   stopDate: String,
   timeStampLocation: Option[TimeStampLocation],
