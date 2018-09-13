@@ -18,7 +18,7 @@ class DataServiceSpec extends FlatSpec {
       res.bodyAsText.compile.toList.map(_.head)
     }.unsafeRunSync
 
-    assert(body == status.asJson.noSpaces)
+    assert(body == HapiError(status).asJson.noSpaces)
   }
 
   "The data service" should "return a 1402 for invalid start times" in {

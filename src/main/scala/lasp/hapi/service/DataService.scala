@@ -36,9 +36,12 @@ class DataService[F[_]: Effect] extends Http4sDsl[F] {
               _ => Status.`1409`, _.format
             ).toEither
           } yield DataRequest(id, minTime, maxTime, params, inc, fmt)
-        req.fold(err => BadRequest(err.asJson), _ => Ok("Hello from HAPI!"))
+        req.fold(
+          err => BadRequest(HapiError(err).asJson),
+          _   => Ok("Hello from HAPI!")
+        )
       // Return a 1400 error if the required parameters are not given.
       case GET -> Root / "hapi" / "data" :? _ =>
-        BadRequest(Status.`1400`.asJson)
+        BadRequest(HapiError(Status.`1400`).asJson)
     }
 }

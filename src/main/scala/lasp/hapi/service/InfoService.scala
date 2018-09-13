@@ -18,6 +18,6 @@ class InfoService[F[_]: Effect] extends Http4sDsl[F] {
         Ok("Hello from HAPI!")
       // Return a 1400 error if the required parameters are not given.
       case GET -> Root / "hapi" / "info" :? _ =>
-        BadRequest(Status.`1400`.asJson)
+        BadRequest(HapiError(Status.`1400`).asJson)
     }
 }
