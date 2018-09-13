@@ -19,12 +19,9 @@ class Latis2Interpreter[F[_]: Sync](dir: String) extends HapiInterpreter[F] {
     Sync[F].delay {
       new CatalogReader(dir).getDataset() match {
         case dm.Dataset(Function(it)) =>
-          it.flatMap {
-            case Sample(_, Function(it)) =>
-              it.map {
-                case Sample(Text(name), _) =>
-                  Dataset(name)
-              }
+          it.map {
+            case Sample(Text(name), _) =>
+              Dataset(name)
           }.toList
       }
     }
