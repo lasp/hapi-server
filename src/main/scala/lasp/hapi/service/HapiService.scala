@@ -41,7 +41,7 @@ class HapiService[F[_]: Effect](interpreter: HapiInterpreter[F]) {
     // If you see a red squiggly here it's probably a lie.
     val service = {
       new CapabilitiesService[F].service         <+>
-      new InfoService[F].service                 <+>
+      new InfoService[F](interpreter).service    <+>
       new CatalogService[F](interpreter).service <+>
       new DataService[F].service
     }
