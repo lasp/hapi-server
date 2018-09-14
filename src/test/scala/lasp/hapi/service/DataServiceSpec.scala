@@ -74,17 +74,17 @@ class DataServiceSpec extends FlatSpec {
     decoded.fold(_ => fail, x => assert(x.format == fmt))
   }
 
-  it should "accept 'binary'" in {
-    val fmt = "binary"
-    val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
-    decoded.fold(_ => fail, x => assert(x.format == fmt))
-  }
+  // it should "accept 'binary'" in {
+  //   val fmt = "binary"
+  //   val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
+  //   decoded.fold(_ => fail, x => assert(x.format == fmt))
+  // }
 
-  it should "accept 'json'" in {
-    val fmt = "json"
-    val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
-    decoded.fold(_ => fail, x => assert(x.format == fmt))
-  }
+  // it should "accept 'json'" in {
+  //   val fmt = "json"
+  //   val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
+  //   decoded.fold(_ => fail, x => assert(x.format == fmt))
+  // }
 
   it should "reject other arguments" in {
     val decoded = Format.formatDecoder.decode(QueryParameterValue("yolo"))

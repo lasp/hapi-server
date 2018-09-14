@@ -16,7 +16,7 @@ class CapabilitiesService[F[_]: Effect] extends Http4sDsl[F] {
           Capabilities(
             HapiService.version,
             Status.`1200`,
-            List("binary", "csv", "json")
+            List("csv")
           ).asJson
         )
     }
