@@ -43,7 +43,7 @@ class HapiService[F[_]: Effect](interpreter: HapiInterpreter[F]) {
       new CapabilitiesService[F].service         <+>
       new InfoService[F](interpreter).service    <+>
       new CatalogService[F](interpreter).service <+>
-      new DataService[F].service
+      new DataService[F](interpreter).service
     }
     CORS(service, corsConfig)
   }

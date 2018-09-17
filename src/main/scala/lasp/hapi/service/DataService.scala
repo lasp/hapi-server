@@ -1,14 +1,19 @@
 package lasp.hapi.service
 
+import cats.data.EitherT
 import cats.effect.Effect
 import cats.implicits._
+import fs2.Stream
 import io.circe.syntax._
 import org.http4s.HttpService
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
+import org.http4s.MediaType
 
 /** Implements the `/data` endpoint. */
-class DataService[F[_]: Effect] extends Http4sDsl[F] {
+class DataService[F[_]: Effect](
+  alg: DataAlgebra[F] with InfoAlgebra[F]
+) extends Http4sDsl[F] {
   import Format._
   import Include._
   import QueryDecoders._
@@ -36,10 +41,34 @@ class DataService[F[_]: Effect] extends Http4sDsl[F] {
               _ => Status.`1409`, _.format
             ).toEither
           } yield DataRequest(id, minTime, maxTime, params, inc, fmt)
-        req.fold(
-          err => BadRequest(HapiError(err).asJson),
-          _   => Ok("Hello from HAPI!")
-        )
+        val records: EitherT[F, Status, Stream[F, String]] = for {
+          req     <- EitherT.fromEither[F](req)
+          header  <- alg.getMetadata(_id, _params).leftMap {
+            case UnknownId(_)    => Status.`1406`
+            case UnknownParam(_) => Status.`1407`
+          }.map { md =>
+            "#" ++ InfoResponse(
+              HapiService.version,
+              Status.`1200`,
+              md
+            ).asJson.noSpaces
+          }
+          data    <- EitherT.liftF(alg.getData(req))
+          records <- EitherT.pure[F, Status](alg.writeData(data))
+        } yield if (req.header) {
+          Stream.emit(header ++ "\n") ++ records
+        } else {
+          records
+        }
+        records.fold(
+          err => err match {
+            case Status.`1406` | Status.`1407` =>
+              NotFound(HapiError(err).asJson)
+            case _ =>
+              BadRequest(HapiError(err).asJson)
+          },
+          rs  => Ok(rs).map(_.withType(MediaType.`text/csv`))
+        ).flatten
       // Return a 1400 error if the required parameters are not given.
       case GET -> Root / "hapi" / "data" :? _ =>
         BadRequest(HapiError(Status.`1400`).asJson)

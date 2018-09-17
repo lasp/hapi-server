@@ -5,14 +5,21 @@ import cats.data.EitherT
 import cats.data.NonEmptyList
 import cats.effect.Sync
 import cats.implicits._
+import fs2.Stream
 import latis.dm
 import latis.dm.{ Dataset => _, _ }
 import latis.ops.Operation
 import latis.ops.Projection
+import latis.ops.TimeFormatter
+import latis.ops.filter.Selection
 import latis.reader.CatalogReader
+
+import lasp.hapi.util.Time
 
 /** Interpreter for HAPI algebras using LaTiS 2. */
 class Latis2Interpreter[F[_]: Sync] extends HapiInterpreter[F] {
+
+  type T = dm.Dataset
 
   override val getCatalog: F[List[Dataset]] =
     Sync[F].delay {
@@ -55,4 +62,33 @@ class Latis2Interpreter[F[_]: Sync] extends HapiInterpreter[F] {
       // Get the metadata.
       metadata <- EitherT.liftF(Latis2Util.getDatasetMetadata(dataset))
     } yield metadata
+
+  override def getData(req: DataRequest): F[dm.Dataset] = req match {
+    case DataRequest(id, minTime, maxTime, params, _, _) =>
+      val ops = List(
+        Selection(s"time>=${minTime.format(Time.format)}"),
+        Selection(s"time<${maxTime.format(Time.format)}"),
+        TimeFormatter("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+      ) ++ params.fold(
+        List.empty[Operation]
+      )(
+        ps => List(Projection("time" :: ps.toList))
+      )
+      Latis2Util.getDataset(id, ops)
+  }
+
+  override def writeData(data: dm.Dataset): Stream[F, String] =
+    Stream.eval(data.pure[F]).flatMap {
+      case dm.Dataset(Function(it)) =>
+        val rows = it.map {
+          case Sample(Index(_), Text(t))  => t
+          case Sample(Text(t), Scalar(x)) => s"$t,$x"
+          case Sample(Text(t), Tuple(xs)) =>
+            val scalars = xs.map {
+              case Scalar(x) => x.toString
+            }.mkString(",")
+            s"$t,$scalars"
+        }.map(_ + "\n")
+        Stream.fromIterator(rows)
+    }
 }
