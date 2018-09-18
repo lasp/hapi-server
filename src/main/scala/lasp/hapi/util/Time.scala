@@ -30,7 +30,7 @@ object Time {
     }
 
   /** Format for normal date/time strings. */
-  private val format: DateTimeFormatter =
+  val format: DateTimeFormatter =
     new DateTimeFormatterBuilder()
       .appendPattern("yyyy[-MM[-dd['T'HH[:mm[:ss[.SSS]]]]]]['Z']")
       .parseDefaulting(MONTH_OF_YEAR, 1)
@@ -42,7 +42,7 @@ object Time {
       .toFormatter()
 
   /** Format for ordinal date/time strings. */
-  private val formatOrd: DateTimeFormatter =
+  val formatOrd: DateTimeFormatter =
     new DateTimeFormatterBuilder()
       .appendPattern("yyyy[-DDD['T'HH[:mm[:ss[.SSS]]]]]['Z']")
       .parseDefaulting(MONTH_OF_YEAR, 1)
