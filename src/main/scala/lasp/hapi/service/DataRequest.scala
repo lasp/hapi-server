@@ -2,6 +2,8 @@ package lasp.hapi.service
 
 import java.time.LocalDateTime
 
+import cats.data.NonEmptyList
+
 /**
  * Represents a request for data.
  *
@@ -16,7 +18,7 @@ final case class DataRequest(
   id: String,
   minTime: LocalDateTime,
   maxTime: LocalDateTime,
-  parameters: Option[List[String]],
+  parameters: Option[NonEmptyList[String]],
   header: Boolean,
   format: String
 )

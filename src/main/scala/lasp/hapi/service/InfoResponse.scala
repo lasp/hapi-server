@@ -7,53 +7,34 @@ import io.circe.Encoder
  *
  * @param version HAPI version
  * @param status HAPI status code
- * @param format output format of data
- * @param parameters selected parameters in dataset
- * @param startDate time of first sample in dataset (restricted ISO 8601)
- * @param stopDate time of last sample in dataset (restricted ISO 8601)
- * @param timeStampLocation location of time stamp within measurement window
- * @param cadence time cadence (ISO 8601 duration)
- * @param sampleStartDate time of first sample in example subset (restricted ISO 8601)
- * @param sampleStopDate time of last sample in example subset (restricted ISO 8601)
- * @param description description of dataset
- * @param resourceURL URL with more information about dataset
- * @param creationDate time of dataset creation (restricted ISO 8601)
- * @param modificationDate time of last modification (restricted ISO 8601)
- * @param contact information about contact person
- * @param contactID ID in discovery system for contact person
+ * @param metadata dataset metadata
  */
 final case class InfoResponse(
   version: String,
   status: Status,
-  format: String,
-  parameters: List[Parameter],
-  startDate: String,
-  stopDate: String,
-  timeStampLocation: Option[TimeStampLocation],
-  cadence: Option[String],
-  sampleStartDate: Option[String],
-  sampleStopDate: Option[String],
-  description: Option[String],
-  resourceURL: Option[String],
-  creationDate: Option[String],
-  modificationDate: Option[String],
-  contact: Option[String],
-  contactID: Option[String]
+  metadata: Metadata
 )
 
 object InfoResponse {
 
-  /** JSON encoder */
+  /**
+   * JSON encoder
+   *
+   * Note that we are flattening out the `metadata` field.
+   */
   implicit val encoder: Encoder[InfoResponse] =
-    Encoder.forProduct16(
-      "HAPI", "status", "format", "parameters", "startDate", "stopDate",
+    Encoder.forProduct15(
+      "HAPI", "status", "parameters", "startDate", "stopDate",
       "timeStampLocation", "cadence", "sampleStartDate", "sampleStopDate",
       "description", "resourceURL", "creationDate", "modificationDate",
       "contact", "contactID"
     ) { x =>
-      (x.version, x.status, x.format, x.parameters, x.startDate, x.stopDate,
-        x.timeStampLocation, x.cadence, x.sampleStartDate, x.sampleStopDate,
-        x.description, x.resourceURL, x.creationDate, x.modificationDate,
-        x.contact, x.contactID)
+      (x.version, x.status, x.metadata.parameters,
+        x.metadata.startDate, x.metadata.stopDate,
+        x.metadata.timeStampLocation, x.metadata.cadence,
+        x.metadata.sampleStartDate, x.metadata.sampleStopDate,
+        x.metadata.description, x.metadata.resourceURL,
+        x.metadata.creationDate, x.metadata.modificationDate,
+        x.metadata.contact, x.metadata.contactID)
     }
 }

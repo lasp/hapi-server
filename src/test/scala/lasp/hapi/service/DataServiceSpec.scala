@@ -1,6 +1,8 @@
 package lasp.hapi.service
 
+import cats.data.NonEmptyList
 import cats.effect.IO
+import cats.implicits._
 import io.circe.syntax._
 import org.http4s._
 import org.http4s.implicits._
@@ -90,9 +92,9 @@ class DataServiceSpec extends FlatSpec {
   }
 
   "The 'parameters' parameter" should "accept a list of parameter names" in {
-    val params = List("a", "b", "c")
+    val params = NonEmptyList.of("a", "b", "c")
     val decoded = QueryDecoders.csvDecoder[String].decode(
-      QueryParameterValue(params.mkString(","))
+      QueryParameterValue(params.mkString_("", ",", ""))
     )
     decoded.fold(_ => fail, x => assert(x == params))
   }
