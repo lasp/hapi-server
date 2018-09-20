@@ -4,6 +4,22 @@ A [HAPI][hapi] server built on LaTiS.
 
 [hapi]: https://hapi-server.github.io/
 
+## Configuration
+
+There are two methods for configuring the HAPI server:
+
+1. [HOCON][hocon] configuration file
+2. Environment variables
+
+### Configuration Options
+
+| Configuration key | Environment variable | Description                  | Default          |
+| ----------------- | -------------------- | ---------------------------- | ---------------- |
+| `port`            | `HAPI_PORT`          | Port to listen on            | 8080             |
+| `mapping`         | `HAPI_MAPPING`       | URL segment before `/hapi`   | "/"              |
+
+[hocon]: https://github.com/lightbend/config/blob/master/HOCON.md
+
 ## Running with Docker
 
 The `docker` SBT task will build a Docker image. The Docker daemon
@@ -15,7 +31,8 @@ Then run the container:
 $ docker run -p 8080:8080 <IMAGE ID>
 ```
 
-The endpoints will be available at `http://localhost:8080/`.
+The landing page will be available at `http://localhost:8080/hapi`
+with the default configuration.
 
 ## Running with an executable JAR
 
@@ -27,4 +44,11 @@ Then run the JAR:
 $ java -jar <JAR>
 ```
 
-The endpoints will be available at `http://localhost:8080/`.
+Or with a specific configuration file:
+
+```
+$ java -Dconfig.file=<CONF> -jar <JAR>
+```
+
+The landing page will be available at `http://localhost:8080/hapi`
+with the default configuration.
