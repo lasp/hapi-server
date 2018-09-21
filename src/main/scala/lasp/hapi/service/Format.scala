@@ -14,7 +14,7 @@ object Format {
   implicit val formatDecoder: QueryParamDecoder[Format] =
     new QueryParamDecoder[Format] {
       override def decode(qpv: QueryParameterValue) = qpv.value match {
-        case fmt @ ("csv" | "binary" | "json") => Format(fmt).validNel
+        case fmt @ "csv" => Format(fmt).validNel
         case _ =>
           ParseFailure(
             "Invalid value for 'format' parameter",

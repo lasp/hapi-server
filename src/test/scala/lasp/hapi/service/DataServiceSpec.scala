@@ -9,11 +9,13 @@ import org.http4s.implicits._
 import org.scalatest.Assertion
 import org.scalatest.FlatSpec
 
+import lasp.hapi.service.HapiInterpreter.noopInterpreter
+
 class DataServiceSpec extends FlatSpec {
 
   /** Assert GET request to given URI returns a particular status. */
   def assertStatus(uri: Uri, status: Status): Assertion = {
-    val service = new DataService[IO].service
+    val service = new DataService[IO](noopInterpreter).service
     val req = Request[IO](Method.GET, uri)
 
     val body = service.orNotFound(req).flatMap { res =>
@@ -74,17 +76,17 @@ class DataServiceSpec extends FlatSpec {
     decoded.fold(_ => fail, x => assert(x.format == fmt))
   }
 
-  it should "accept 'binary'" in {
-    val fmt = "binary"
-    val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
-    decoded.fold(_ => fail, x => assert(x.format == fmt))
-  }
+  // it should "accept 'binary'" in {
+  //   val fmt = "binary"
+  //   val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
+  //   decoded.fold(_ => fail, x => assert(x.format == fmt))
+  // }
 
-  it should "accept 'json'" in {
-    val fmt = "json"
-    val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
-    decoded.fold(_ => fail, x => assert(x.format == fmt))
-  }
+  // it should "accept 'json'" in {
+  //   val fmt = "json"
+  //   val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
+  //   decoded.fold(_ => fail, x => assert(x.format == fmt))
+  // }
 
   it should "reject other arguments" in {
     val decoded = Format.formatDecoder.decode(QueryParameterValue("yolo"))

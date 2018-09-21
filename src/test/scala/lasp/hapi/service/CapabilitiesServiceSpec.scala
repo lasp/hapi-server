@@ -9,7 +9,7 @@ import org.scalatest.FlatSpec
 
 class CapabilitiesServiceSpec extends FlatSpec {
 
-  "The capabilities service" should "advertise all output options" in {
+  "The capabilities service" should "advertise CSV only" in {
     val req = Request[IO](Method.GET, Uri.uri("/hapi/capabilities"))
 
     val expected = Json.obj(
@@ -17,9 +17,7 @@ class CapabilitiesServiceSpec extends FlatSpec {
       ("status", Status.`1200`.asJson),
       ("outputFormats", Json.fromValues(
         List(
-          Json.fromString("binary"),
-          Json.fromString("csv"),
-          Json.fromString("json")
+          Json.fromString("csv")
         )
       ))
     )
