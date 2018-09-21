@@ -21,7 +21,7 @@ class InfoService[F[_]: Effect](alg: InfoAlgebra[F]) extends Http4sDsl[F] {
           case UnknownId(_)    => Status.`1406`
           case UnknownParam(_) => Status.`1407`
         }.fold(
-          err => BadRequest(HapiError(err).asJson),
+          err => NotFound(HapiError(err).asJson),
           res => Ok(
             InfoResponse(HapiService.version, Status.`1200`, res).asJson
           )
