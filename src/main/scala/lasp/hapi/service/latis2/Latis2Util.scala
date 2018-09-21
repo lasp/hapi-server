@@ -89,9 +89,7 @@ object Latis2Util {
           Parameter(
             "time",
             HIsoTime,
-            // This will only be correct if the time is already a HAPI
-            // time string.
-            md.get("length").map(_.toInt),
+            Option(24),
             "UTC",
             None,
             None,
