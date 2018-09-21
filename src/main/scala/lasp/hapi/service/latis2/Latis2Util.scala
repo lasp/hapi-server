@@ -7,6 +7,9 @@ import cats.implicits._
 import latis.dm._
 import latis.ops.Operation
 import latis.reader.DatasetAccessor
+import latis.time.Time
+
+import lasp.hapi.util
 
 /** Utility methods for working with LaTiS 2. */
 object Latis2Util {
@@ -50,6 +53,8 @@ object Latis2Util {
           for {
             tParam <- getParameterMetadata(tVar)
             timeMd  = tVar.getMetadata
+            tMin   <- convertTime(timeMd.get("min").get)
+            tMax   <- convertTime(timeMd.get("max").get)
             // We are assuming no nested functions. We also need to
             // check that a scalar range variables isn't time so we
             // don't include it twice. (See above.)
@@ -63,8 +68,8 @@ object Latis2Util {
             }
           } yield Metadata(
             NonEmptyList(tParam, params),
-            timeMd.get("min").get,
-            timeMd.get("max").get,
+            tMin,
+            tMax,
             None,
             None,
             None,
@@ -130,5 +135,11 @@ object Latis2Util {
             None
           )
       }
+    }
+
+  /** Convert a time of a given scale to a HAPI time string. */
+  private def convertTime[F[_]: Sync](time: String): F[String] =
+    Sync[F].delay {
+      Time.fromIso(time).format(util.Time.formatSDF)
     }
 }
