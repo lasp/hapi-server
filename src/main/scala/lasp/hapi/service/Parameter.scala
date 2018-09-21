@@ -17,9 +17,9 @@ import io.circe.Encoder
 final case class Parameter(
   name: String,
   dType: DataType,
-  length: Option[Integer],
+  length: Option[Int],
   units: String,
-  size: Option[List[Integer]],
+  size: Option[List[Int]],
   fill: Option[String],
   description: Option[String],
   bins: Option[List[Bin]]
