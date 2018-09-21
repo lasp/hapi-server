@@ -41,6 +41,10 @@ object Time {
       .parseDefaulting(NANO_OF_SECOND, 0)
       .toFormatter()
 
+  /** Format as `SimpleDateFormat` string. */
+  val formatSDF: String =
+    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+
   /** Format for ordinal date/time strings. */
   val formatOrd: DateTimeFormatter =
     new DateTimeFormatterBuilder()

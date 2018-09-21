@@ -68,7 +68,7 @@ class Latis2Interpreter[F[_]: Sync] extends HapiInterpreter[F] {
       val ops = List(
         Selection(s"time>=${minTime.format(Time.format)}"),
         Selection(s"time<${maxTime.format(Time.format)}"),
-        TimeFormatter("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+        TimeFormatter(Time.formatSDF)
       ) ++ params.fold(
         List.empty[Operation]
       )(
