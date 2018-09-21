@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoField.DAY_OF_MONTH
+import java.time.temporal.ChronoField.DAY_OF_YEAR
 import java.time.temporal.ChronoField.HOUR_OF_DAY
 import java.time.temporal.ChronoField.MINUTE_OF_HOUR
 import java.time.temporal.ChronoField.MONTH_OF_YEAR
@@ -49,8 +50,7 @@ object Time {
   val formatOrd: DateTimeFormatter =
     new DateTimeFormatterBuilder()
       .appendPattern("yyyy[-DDD['T'HH[:mm[:ss[.SSS]]]]]['Z']")
-      .parseDefaulting(MONTH_OF_YEAR, 1)
-      .parseDefaulting(DAY_OF_MONTH, 1)
+      .parseDefaulting(DAY_OF_YEAR, 1)
       .parseDefaulting(HOUR_OF_DAY, 0)
       .parseDefaulting(MINUTE_OF_HOUR, 0)
       .parseDefaulting(SECOND_OF_MINUTE, 0)
