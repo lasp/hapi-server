@@ -28,10 +28,16 @@ object QueryDecoders {
             "Empty parameter list.", "Empty parameter list."
           ).invalidNel
         } else {
-          // Call to '.get' is safe here because we've already checked
-          // that the parameter list is non-empty.
-          qpv.value.split(',').toList.toNel.get.traverse { x =>
-            QueryParamDecoder[A].decode(QueryParameterValue(x))
+          // The '-1' means we get empty strings where there are empty
+          // fields rather than ignoring them. The call to 'split'
+          // will always return a non-empty list, even for empty
+          // inputs, so '.get' is safe.
+          qpv.value.split(",", -1).toList.toNel.get.traverse { x =>
+            if (x.nonEmpty) {
+              QueryParamDecoder[A].decode(QueryParameterValue(x))
+            } else {
+              ParseFailure("Empty field.", "Empty field.").invalidNel
+            }
           }
         }
     }

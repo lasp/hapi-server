@@ -25,6 +25,11 @@ class DataServiceSpec extends FlatSpec {
     assert(body == HapiError(status).asJson.noSpaces)
   }
 
+  /** Assert the CSV decoder rejects the argument. */
+  def csvDecoderReject(arg: String): Assertion =
+    QueryDecoders.csvDecoder[String].decode(QueryParameterValue(arg))
+      .fold(_ => succeed, _ => fail(s"Accepted bad input: '$arg'"))
+
   "The data service" should "return a 1402 for invalid start times" in {
     assertStatus(
       Uri.uri("/hapi/data?id=0&time.min=invalid&time.max=2018Z"),
@@ -102,9 +107,22 @@ class DataServiceSpec extends FlatSpec {
   }
 
   it should "reject an empty parameter list" in {
-    val decoded = QueryDecoders.csvDecoder[String].decode(
-      QueryParameterValue("")
-    )
-    decoded.fold(_ => succeed, _ => fail("Accepted empty parameter list."))
+    csvDecoderReject("")
+  }
+
+  it should "reject commas with no values" in {
+    csvDecoderReject(",,,")
+  }
+
+  it should "reject empty fields" in {
+    csvDecoderReject("a,,c")
+  }
+
+  it should "reject leading commas" in {
+    csvDecoderReject(",b,c")
+  }
+
+  it should "reject trailing commas" in {
+    csvDecoderReject("a,b,")
   }
 }
