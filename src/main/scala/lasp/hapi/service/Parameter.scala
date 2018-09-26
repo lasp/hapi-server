@@ -1,6 +1,8 @@
 package lasp.hapi.service
 
 import io.circe.Encoder
+import io.circe.JsonObject
+import io.circe.generic.semiauto._
 
 /**
  * Represents a parameter in a HAPI dataset.
@@ -27,11 +29,22 @@ final case class Parameter(
 
 object Parameter {
 
-  /** JSON encoder */
+  /**
+   * JSON encoder
+   *
+   * This encoder will drop parameters that are None except for fill,
+   * which is always required.
+   */
   implicit val encoder: Encoder[Parameter] =
-    Encoder.forProduct8(
-      "name", "type", "length", "units", "size", "fill", "description", "bins"
-    ) { x =>
-      (x.name, x.dType, x.length, x.units, x.size, x.fill, x.description, x.bins)
+    deriveEncoder[Parameter].mapJsonObject { obj =>
+      JsonObject.fromIterable {
+        obj.toList.filter {
+          case ("fill", _) => true
+          case (_, v)      => !v.isNull
+        }.map {
+          case ("dType", v) => ("type", v)
+          case x            => x
+        }
+      }
     }
 }
