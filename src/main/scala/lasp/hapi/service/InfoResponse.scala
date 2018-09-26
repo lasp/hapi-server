@@ -1,6 +1,8 @@
 package lasp.hapi.service
 
 import io.circe.Encoder
+import io.circe.Json
+import io.circe.syntax._
 
 /**
  * Represents a response from the `info` service.
@@ -23,18 +25,10 @@ object InfoResponse {
    * Note that we are flattening out the `metadata` field.
    */
   implicit val encoder: Encoder[InfoResponse] =
-    Encoder.forProduct15(
-      "HAPI", "status", "parameters", "startDate", "stopDate",
-      "timeStampLocation", "cadence", "sampleStartDate", "sampleStopDate",
-      "description", "resourceURL", "creationDate", "modificationDate",
-      "contact", "contactID"
-    ) { x =>
-      (x.version, x.status, x.metadata.parameters,
-        x.metadata.startDate, x.metadata.stopDate,
-        x.metadata.timeStampLocation, x.metadata.cadence,
-        x.metadata.sampleStartDate, x.metadata.sampleStopDate,
-        x.metadata.description, x.metadata.resourceURL,
-        x.metadata.creationDate, x.metadata.modificationDate,
-        x.metadata.contact, x.metadata.contactID)
+    new Encoder[InfoResponse] {
+      override def apply(x: InfoResponse): Json =
+        Encoder[Metadata].apply(x.metadata).deepMerge(
+          Json.obj("HAPI" -> x.version.asJson, "status" -> x.status.asJson)
+        )
     }
 }

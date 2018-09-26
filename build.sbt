@@ -11,6 +11,7 @@ lazy val `hapi-server` = (project in file("."))
   .settings(dockerSettings)
   .settings(
     libraryDependencies ++= Seq(
+      "io.circe"              %% "circe-generic"          % "0.9.3",
       "org.http4s"            %% "http4s-blaze-server"    % http4sVersion,
       "org.http4s"            %% "http4s-circe"           % http4sVersion,
       "org.http4s"            %% "http4s-dsl"             % http4sVersion,

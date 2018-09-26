@@ -1,6 +1,8 @@
 package lasp.hapi.service
 
 import cats.data.NonEmptyList
+import io.circe.Encoder
+import io.circe.generic.semiauto._
 
 /**
  * Represents metadata for HAPI datasets.
@@ -34,3 +36,18 @@ final case class Metadata(
   contact: Option[String],
   contactID: Option[String]
 )
+
+object Metadata {
+
+  /**
+   * JSON encoder
+   *
+   * This encoder will drop parameters that are None.
+   */
+  implicit val encoder: Encoder[Metadata] =
+    deriveEncoder[Metadata].mapJsonObject {
+      _.filter {
+        case (_, v) => !v.isNull
+      }
+    }
+}
