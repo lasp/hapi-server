@@ -17,6 +17,7 @@ There are two methods for configuring the HAPI server:
 | ----------------- | -------------------- | ---------------------------- | ---------------- |
 | `port`            | `HAPI_PORT`          | Port to listen on            | 8080             |
 | `mapping`         | `HAPI_MAPPING`       | URL segment before `/hapi`   | "/"              |
+| `catalog-dir`     | `HAPI_CATALOG`       | Catalog directory            | `./catalog` (JAR); `/srv/hapi` (Docker) |
 
 [hocon]: https://github.com/lightbend/config/blob/master/HOCON.md
 
@@ -28,7 +29,7 @@ must be running.
 Then run the container:
 
 ```
-$ docker run -p 8080:8080 <IMAGE ID>
+$ docker run -p 8080:8080 --mount type=bind,src=<CATALOG DIR>,dst=/srv/hapi <IMAGE ID>
 ```
 
 The landing page will be available at `http://localhost:8080/hapi`

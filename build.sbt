@@ -57,7 +57,10 @@ lazy val dockerSettings = Seq(
   },
   docker / dockerfile := {
     val jarFile = (Compile / packageBin / sbt.Keys.`package`).value
-    val classpath = (Runtime / managedClasspath).value
+    val classpath = Seq(
+      (Runtime / managedClasspath).value,
+      (Runtime / internalDependencyAsJars).value
+    ).flatten
     val mainclass = (Compile / packageBin / mainClass).value.getOrElse {
       sys.error("Expected exactly one main class")
     }
@@ -71,6 +74,7 @@ lazy val dockerSettings = Seq(
       copy(classpath.files, "/app/")
       copy(jarFile, jarTarget)
       expose(8080)
+      env("HAPI_CATALOG", "/srv/hapi")
       entryPoint("java", "-cp", cp, mainclass)
     }
   }

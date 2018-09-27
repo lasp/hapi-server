@@ -11,7 +11,6 @@ import org.http4s.HttpService
 import org.http4s.server.blaze._
 import pureconfig.module.catseffect._
 
-import lasp.hapi.service.HapiInterpreter
 import lasp.hapi.service.HapiService
 import lasp.hapi.service.LandingPageService
 import lasp.hapi.util.HapiConfig
@@ -27,7 +26,9 @@ object HapiServer extends HapiServerApp[IO]
 abstract class HapiServerApp[F[_]: Effect] extends StreamApp[F] {
 
   private val hapiService: HttpService[F] =
-    new HapiService(HapiInterpreter.noopInterpreter[F]).service
+    new HapiService(
+      new lasp.hapi.service.latis2.Latis2Interpreter[F]
+    ).service
 
   private val landingPage: HttpService[F] =
     new LandingPageService().service
