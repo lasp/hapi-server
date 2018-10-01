@@ -44,16 +44,7 @@ class Latis2Interpreter[F[_]: Sync] extends HapiInterpreter[F] {
         catalog.exists(_.name === id),
         (), UnknownId(id)
       )
-      // Get the dataset, projecting the requested parameters.
-      project   = params.fold(
-        List.empty[Operation]
-      )(
-        // Time must always be included. LaTiS ignores duplicates in a
-        // projection, so there's no need to check that time isn't
-        // already projected.
-        ps => List(Projection("time" :: ps.toList))
-      )
-      dataset  <- EitherT.liftF(Latis2Util.getDataset(id, project))
+      dataset  <- EitherT.liftF(Latis2Util.getDataset(id, List.empty))
       // Check for parameters that were requested but not returned.
       // This would indicate that the parameter wasn't found, so we
       // should return an error.
@@ -61,7 +52,17 @@ class Latis2Interpreter[F[_]: Sync] extends HapiInterpreter[F] {
       _        <- EitherT.fromOption[F](missing.map(UnknownParam), ()).swap
       // Get the metadata.
       metadata <- EitherT.liftF(Latis2Util.getDatasetMetadata(dataset))
-    } yield metadata
+    } yield params.fold(metadata) { ps =>
+      // Filter the returned parameters. We wait until the end to do
+      // this because we need to keep all the parameters in order to
+      // get all the metadata. (Specifically, for making bins.)
+      val newParams = metadata.parameters.filter {
+        case Parameter("time", _, _, _, _, _, _, _) => true
+        case Parameter(name, _, _, _, _, _, _, _)   => ps.exists(_ === name)
+      }
+      // This should be safe because we should at least have time.
+      metadata.copy(parameters = newParams.toNel.get)
+    }
 
   override def getData(req: DataRequest): F[dm.Dataset] = req match {
     case DataRequest(id, minTime, maxTime, params, _, _) =>
@@ -88,6 +89,14 @@ class Latis2Interpreter[F[_]: Sync] extends HapiInterpreter[F] {
               case Scalar(x) => x.toString
             }.mkString(",")
             s"$t,$scalars"
+          case Sample(Text(t), Function(it)) =>
+            s"$t," + it.map {
+              case Sample(_, Scalar(x)) => List(x.toString)
+              case Sample(_, Tuple(xs)) =>
+                xs.map {
+                  case Scalar(x) => x.toString
+                }
+            }.toList.transpose.flatten.mkString(",")
         }.map(_ + "\n")
         Stream.fromIterator(rows)
     }

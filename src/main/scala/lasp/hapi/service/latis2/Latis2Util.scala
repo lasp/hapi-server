@@ -41,7 +41,7 @@ object Latis2Util {
   def getDatasetMetadata[F[_]: Sync](ds: Dataset): F[Metadata] =
     Sync[F].delay {
       ds match {
-        case Dataset(f: Function) =>
+        case Dataset(f @ Function(it)) =>
           // If the domain of the function is an index, the range is
           // the time variable. Time is always projected, so this
           // would imply that the only requested variable was time.
@@ -61,10 +61,34 @@ object Latis2Util {
             params <- f.getRange match {
               case s: Scalar if !s.hasName("time") =>
                 List(getParameterMetadata(s)).sequence
-              case Tuple(vs) =>
+              case Tuple(vs)   =>
                 // We are assuming no empty tuples and no nested tuples.
                 vs.toList.traverse(getParameterMetadata(_))
-              case _         => List().pure[F]
+              case g: Function =>
+                val size = g.getMetadata("length").get.toInt
+                val name = g.getDomain.getName
+                val units = g.getDomain.getMetadata("units").get
+                // Need to read the first sample in order to get the
+                // domain of the inner function.
+                val bin = it.next match {
+                  case Sample(_, Function(it)) =>
+                    val ws = it.map {
+                      case Sample(Number(w), _) => w
+                    }.toList
+                    Bin(name, ws.some, None, units, None)
+                }
+                // Get metadata for the parameters and add the size
+                // and bin information.
+                val xs = g.getRange match {
+                  case s: Scalar => List(s)
+                  case Tuple(vs) => vs.toList
+                }
+                xs.traverse { p =>
+                  getParameterMetadata(p).map {
+                    _.copy(size = List(size).some, bins = List(bin).some)
+                  }
+                }
+              case _ => List().pure[F]
             }
           } yield Metadata(
             NonEmptyList(tParam, params),
