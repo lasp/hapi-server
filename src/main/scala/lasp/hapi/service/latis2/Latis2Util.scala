@@ -68,6 +68,7 @@ object Latis2Util {
                 val size = g.getMetadata("length").get.toInt
                 val name = g.getDomain.getName
                 val units = g.getDomain.getMetadata("units").get
+                val desc = g.getDomain.getMetadata("description")
                 // Need to read the first sample in order to get the
                 // domain of the inner function.
                 val bin = it.next match {
@@ -75,7 +76,7 @@ object Latis2Util {
                     val ws = it.map {
                       case Sample(Number(w), _) => w
                     }.toList
-                    Bin(name, ws.some, None, units, None)
+                    Bin(name, ws.some, None, units, desc)
                 }
                 // Get metadata for the parameters and add the size
                 // and bin information.
@@ -94,16 +95,16 @@ object Latis2Util {
             NonEmptyList(tParam, params),
             tMin,
             tMax,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None
+            timeMd.get("timeStampLocation").flatMap(TimeStampLocation(_)),
+            timeMd.get("cadence"),
+            ds.getMetadata.get("sampleStartDate"),
+            ds.getMetadata.get("sampleStopDate"),
+            ds.getMetadata.get("description"),
+            ds.getMetadata.get("resourceURL"),
+            ds.getMetadata.get("creationDate"),
+            ds.getMetadata.get("modificationDate"),
+            ds.getMetadata.get("contact"),
+            ds.getMetadata.get("contactID")
           )
       }
    }.flatten
@@ -121,8 +122,8 @@ object Latis2Util {
             Option(24),
             "UTC",
             None,
-            None,
-            None,
+            md.get("missing_value"),
+            md.get("description"),
             None
           )
         case _: Real =>
@@ -132,8 +133,8 @@ object Latis2Util {
             None,
             md.get("units").get,
             None,
-            None,
-            None,
+            md.get("missing_value"),
+            md.get("description"),
             None
           )
         case _: Integer =>
@@ -143,8 +144,8 @@ object Latis2Util {
             None,
             md.get("units").get,
             None,
-            None,
-            None,
+            md.get("missing_value"),
+            md.get("description"),
             None
           )
         case _: Text =>
@@ -154,8 +155,8 @@ object Latis2Util {
             md.get("length").map(_.toInt),
             md.get("units").get,
             None,
-            None,
-            None,
+            md.get("missing_value"),
+            md.get("description"),
             None
           )
       }
