@@ -20,6 +20,15 @@ final case object Other extends TimeStampLocation
 
 object TimeStampLocation {
 
+  def apply(str: String): Option[TimeStampLocation] =
+    str.toLowerCase match {
+      case "begin"  => Option(Begin)
+      case "center" => Option(Center)
+      case "end"    => Option(End)
+      case "other"  => Option(Other)
+      case _        => None
+    }
+
   /** JSON encoder */
   implicit val encoder: Encoder[TimeStampLocation] =
     Encoder.instance {
