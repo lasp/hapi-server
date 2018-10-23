@@ -21,6 +21,11 @@ There are two methods for configuring the HAPI server:
 
 [hocon]: https://github.com/lightbend/config/blob/master/HOCON.md
 
+## Configuring Datasets
+
+See [Configuring Datasets](docs/configuring-datasets.md) for an
+example.
+
 ## Running with Docker
 
 The `docker` SBT task will build a Docker image. The Docker daemon
