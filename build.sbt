@@ -9,6 +9,7 @@ lazy val `hapi-server` = (project in file("."))
   .dependsOn(latis2)
   .settings(compilerFlags)
   .settings(dockerSettings)
+  .settings(assemblySettings)
   .settings(
     libraryDependencies ++= Seq(
       "io.circe"              %% "circe-generic"          % "0.9.3",
@@ -77,5 +78,14 @@ lazy val dockerSettings = Seq(
       env("HAPI_CATALOG", "/srv/hapi")
       entryPoint("java", "-cp", cp, mainclass)
     }
+  }
+)
+
+lazy val assemblySettings = Seq(
+  assembly / assemblyMergeStrategy := {
+    case "latis.properties" => MergeStrategy.first
+    case x =>
+      val strategy = (assemblyMergeStrategy in assembly).value
+      strategy(x)
   }
 )
