@@ -5,11 +5,25 @@ val http4sVersion     = "0.18.17"
 val pureconfigVersion = "0.9.2"
 
 lazy val `hapi-server` = (project in file("."))
+  .disablePlugins(RevolverPlugin)
+  .aggregate(server, service)
+  .dependsOn(server, service)
+  .settings(assemblySettings)
+  .settings(
+    assembly / aggregate := false,
+    assembly / mainClass := Some("lasp.hapi.server.HapiServer")
+  )
+
+lazy val server = project
   .enablePlugins(DockerPlugin)
-  .dependsOn(latis2)
+  .dependsOn(service)
   .settings(compilerFlags)
   .settings(dockerSettings)
-  .settings(assemblySettings)
+
+lazy val service = project
+  .disablePlugins(RevolverPlugin)
+  .dependsOn(latis2)
+  .settings(compilerFlags)
   .settings(
     libraryDependencies ++= Seq(
       "io.circe"              %% "circe-generic"          % "0.9.3",
@@ -54,7 +68,7 @@ lazy val compilerFlags = Seq(
 
 lazy val dockerSettings = Seq(
   docker / imageNames := {
-    Seq(ImageName(s"${organization.value}/${name.value}:${version.value}"))
+    Seq(ImageName(s"${organization.value}/hapi-server:${version.value}"))
   },
   docker / dockerfile := {
     val jarFile = (Compile / packageBin / sbt.Keys.`package`).value
