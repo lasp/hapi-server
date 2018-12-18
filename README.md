@@ -1,4 +1,4 @@
-# LASP HAPI Server
+# <img align="right" src="http://lasp.colorado.edu/home/wp-content/uploads/2012/01/lasp-logo.color_.1line-subtext.transp-bg.med_.png" height="75" width="256"/> LASP HAPI Server
 
 A [HAPI][hapi] server built on LaTiS.
 
