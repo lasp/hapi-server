@@ -9,6 +9,7 @@ import org.http4s.HttpService
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.MediaType
+import org.log4s._
 
 /** Implements the `/data` endpoint. */
 class DataService[F[_]: Effect](
@@ -17,6 +18,8 @@ class DataService[F[_]: Effect](
   import Format._
   import Include._
   import QueryDecoders._
+
+ private[this] val logger = getLogger
 
   val service: HttpService[F] =
     HttpService[F] {
@@ -63,14 +66,17 @@ class DataService[F[_]: Effect](
         records.fold(
           err => err match {
             case Status.`1406` | Status.`1407` =>
+              logger.info(err.message)
               NotFound(HapiError(err).asJson)
             case _ =>
+              logger.info(err.message)
               BadRequest(HapiError(err).asJson)
           },
           rs  => Ok(rs).map(_.withType(MediaType.`text/csv`))
         ).flatten
       // Return a 1400 error if the required parameters are not given.
       case GET -> Root / "hapi" / "data" :? _ =>
+        logger.info(Status.`1400`.message)
         BadRequest(HapiError(Status.`1400`).asJson)
     }
 }

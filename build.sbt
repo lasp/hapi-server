@@ -17,6 +17,7 @@ lazy val `hapi-server` = (project in file("."))
       "org.http4s"            %% "http4s-circe"           % http4sVersion,
       "org.http4s"            %% "http4s-dsl"             % http4sVersion,
       "org.http4s"            %% "http4s-scalatags"       % http4sVersion,
+      "org.log4s"             %% "log4s"                  % "1.6.1",
       "ch.qos.logback"         % "logback-classic"        % "1.2.3" % Runtime,
       "com.github.pureconfig" %% "pureconfig"             % pureconfigVersion,
       "com.github.pureconfig" %% "pureconfig-cats-effect" % pureconfigVersion,

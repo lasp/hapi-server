@@ -7,6 +7,7 @@ import cats.implicits._
 import org.http4s.HttpService
 import org.http4s.server.middleware.CORS
 import org.http4s.server.middleware.CORSConfig
+import org.http4s.server.middleware.Logger
 
 /**
  * A grouping of all four required HAPI endpoints.
@@ -45,7 +46,9 @@ class HapiService[F[_]: Effect](interpreter: HapiInterpreter[F]) {
       new CatalogService[F](interpreter).service <+>
       new DataService[F](interpreter).service
     }
-    CORS(service, corsConfig)
+    Logger(true, false)(
+      CORS(service, corsConfig)
+    )
   }
 }
 
