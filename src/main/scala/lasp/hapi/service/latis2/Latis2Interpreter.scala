@@ -41,7 +41,7 @@ class Latis2Interpreter[F[_]: Sync] extends HapiInterpreter[F] {
       // with UnknownId if not found.
       catalog  <- EitherT.liftF(getCatalog)
       _        <- EitherT.cond[F](
-        catalog.exists(_.name === id),
+        catalog.exists(_.title === id),
         (), UnknownId(id)
       )
       dataset  <- EitherT.liftF(Latis2Util.getDataset(id, List.empty))
