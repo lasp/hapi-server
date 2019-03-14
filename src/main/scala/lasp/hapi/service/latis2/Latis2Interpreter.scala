@@ -11,6 +11,7 @@ import latis.dm.{ Dataset => _, _ }
 import latis.ops.Operation
 import latis.ops.Projection
 import latis.ops.TimeFormatter
+import latis.ops.filter.FirstFilter
 import latis.ops.filter.Selection
 import latis.reader.CatalogReader
 
@@ -44,7 +45,7 @@ class Latis2Interpreter[F[_]: Sync] extends HapiInterpreter[F] {
         catalog.exists(_.title === id),
         (), UnknownId(id)
       )
-      dataset  <- EitherT.liftF(Latis2Util.getDataset(id, List.empty))
+      dataset  <- EitherT.liftF(Latis2Util.getDataset(id, List(FirstFilter())))
       // Check for parameters that were requested but not returned.
       // This would indicate that the parameter wasn't found, so we
       // should return an error.
