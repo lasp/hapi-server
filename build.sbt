@@ -1,35 +1,27 @@
-ThisBuild / organization := "lasp"
-ThisBuild / scalaVersion := "2.12.7"
+ThisBuild / organization := "io.latis-data"
+ThisBuild / scalaVersion := "2.12.8"
 
-val http4sVersion     = "0.18.17"
-val pureconfigVersion = "0.9.2"
+val http4sVersion = "0.20.13"
 
-lazy val `hapi-server` = (project in file("."))
-  .enablePlugins(DockerPlugin)
-  .dependsOn(latis2)
+lazy val root = (project in file("."))
   .settings(compilerFlags)
-  .settings(dockerSettings)
-  .settings(assemblySettings)
   .settings(
+    name := "hapi-server",
     libraryDependencies ++= Seq(
-      "io.circe"              %% "circe-generic"          % "0.9.3",
-      "org.http4s"            %% "http4s-blaze-server"    % http4sVersion,
-      "org.http4s"            %% "http4s-circe"           % http4sVersion,
-      "org.http4s"            %% "http4s-dsl"             % http4sVersion,
-      "org.http4s"            %% "http4s-scalatags"       % http4sVersion,
-      "org.log4s"             %% "log4s"                  % "1.6.1",
-      "ch.qos.logback"         % "logback-classic"        % "1.2.3" % Runtime,
-      "com.github.pureconfig" %% "pureconfig"             % pureconfigVersion,
-      "com.github.pureconfig" %% "pureconfig-cats-effect" % pureconfigVersion,
-      "org.scalatest"         %% "scalatest"              % "3.0.5" % Test
-    ),
-    Test / logBuffered := false
+      "io.latis-data" %% "latis3-core" % "0.1.0-SNAPSHOT",
+      "io.latis-data" %% "latis3-service-interface" % "0.1.0-SNAPSHOT",
+      "io.latis-data" %% "latis3-server" % "0.1.0-SNAPSHOT",
+      "io.latis-data" %% "latis3-hapi" % "0.1.0-SNAPSHOT",
+      "io.latis-data" %% "dap2-service-interface" % "0.1.0-SNAPSHOT",
+      "org.http4s" %% "http4s-dsl" % http4sVersion % Provided,
+      "org.http4s" %% "http4s-circe" % http4sVersion,
+      "org.http4s" %% "http4s-scalatags" % http4sVersion,
+      "io.circe" %% "circe-generic" % "0.12.3",
+      // coursier only seems to include compile dependencies when
+      // building a standalone executable (see coursier/coursier#552)
+      "ch.qos.logback" % "logback-classic" % "1.2.3"
+    )
   )
-
-lazy val latis2 = ProjectRef(
-  uri("git://github.com/latis-data/latis.git#78e60aeb5387a047ceb99db56a1bd49786100904"),
-  "latis"
-)
 
 lazy val compilerFlags = Seq(
   scalacOptions ++= Seq(
@@ -38,7 +30,6 @@ lazy val compilerFlags = Seq(
     "-feature",
     "-language:higherKinds",
     "-unchecked",
-    "-Xfatal-warnings",
     "-Xfuture",
     "-Xlint:-unused,_",
     "-Ypartial-unification",
@@ -48,45 +39,6 @@ lazy val compilerFlags = Seq(
     "-Ywarn-value-discard"
   ),
   Compile / console / scalacOptions --= Seq(
-    "-Xfatal-warnings",
     "-Ywarn-unused"
   )
-)
-
-lazy val dockerSettings = Seq(
-  docker / imageNames := {
-    Seq(ImageName(s"${organization.value}/${name.value}:${version.value}"))
-  },
-  docker / dockerfile := {
-    val jarFile = (Compile / packageBin / sbt.Keys.`package`).value
-    val classpath = Seq(
-      (Runtime / managedClasspath).value,
-      (Runtime / internalDependencyAsJars).value
-    ).flatten
-    val mainclass = (Compile / packageBin / mainClass).value.getOrElse {
-      sys.error("Expected exactly one main class")
-    }
-    val jarTarget = s"/app/${jarFile.getName}"
-    val cp = s"$jarTarget:" + classpath.files.map { x =>
-      s"/app/${x.getName}"
-    }.mkString(":")
-
-    new Dockerfile {
-      from("openjdk:8-jre-alpine")
-      copy(classpath.files, "/app/")
-      copy(jarFile, jarTarget)
-      expose(8080)
-      env("HAPI_CATALOG", "/srv/hapi")
-      entryPoint("java", "-cp", cp, mainclass)
-    }
-  }
-)
-
-lazy val assemblySettings = Seq(
-  assembly / assemblyMergeStrategy := {
-    case "latis.properties" => MergeStrategy.first
-    case x =>
-      val strategy = (assemblyMergeStrategy in assembly).value
-      strategy(x)
-  }
 )
