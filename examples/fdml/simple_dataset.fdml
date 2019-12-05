@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dataset id="simple_dataset"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://latis-data.io/schemas/1.0/fdml-with-text-adapter.xsd">
+
+    <source uri="file:///data/simple_dataset.csv"/>
+
+    <adapter class="latis.input.TextAdapter"
+             commentCharacter="#"
+             delimiter=","/>
+
+    <function>
+        <scalar id="time"
+                type="string"
+                class="latis.time.Time"
+                units="yyyy-MM-dd'T'hh:mm:ss'Z'"
+                coverage="2018-01-01T00:00:00Z/2018-01-01T00:00:02Z"/>
+        <scalar id="value" type="int" units="units"/>
+    </function>
+</dataset>
