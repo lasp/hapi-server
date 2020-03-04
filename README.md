@@ -1,4 +1,4 @@
-# <img align="right" src="http://lasp.colorado.edu/home/wp-content/uploads/2012/01/lasp-logo.color_.1line-subtext.transp-bg.med_.png" height="75" width="256"/> LASP HAPI Server
+# <img align="right" src="https://lasp.colorado.edu/media/projects/lasp/images/logo/2012/color/lasp-logo.color.transp-bg.small.png" height="75" width="256"/> LASP HAPI Server
 
 A [HAPI][hapi] server built on [LaTiS][latis]. This project is based
 on LaTiS v3, which is currently under development.
