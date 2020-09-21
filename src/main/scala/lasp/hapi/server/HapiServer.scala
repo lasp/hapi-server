@@ -1,14 +1,14 @@
 package lasp.hapi.server
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
 import cats.effect._
 import cats.implicits._
-import fs2.Stream
-import fs2.StreamApp
-import fs2.StreamApp.ExitCode
-import org.http4s.HttpService
+import org.http4s.HttpRoutes
+import org.http4s.implicits._
+import org.http4s.server.Router
 import org.http4s.server.blaze._
+import pureconfig.generic.auto._
 import pureconfig.module.catseffect._
 
 import lasp.hapi.service.HapiInterpreter
@@ -21,38 +21,40 @@ import lasp.hapi.util.HapiConfig
  *
  * This is the entry point for the HAPI server.
  */
-object HapiServer extends HapiServerApp[IO](
-  new lasp.hapi.service.latis2.Latis2Interpreter
+object HapiServer extends HapiServerApp(
+  new lasp.hapi.service.latis2.Latis2Interpreter[IO]
 )
 
-/** The HAPI server parameterized over the effect type. */
-abstract class HapiServerApp[F[_]: Effect](
-  interpreter: HapiInterpreter[F]
-) extends StreamApp[F] {
-
-  private val hapiService: HttpService[F] =
+abstract class HapiServerApp(interpreter: HapiInterpreter[IO]) extends IOApp {
+  private val hapiService: HttpRoutes[IO] =
     new HapiService(interpreter).service
 
-  private val landingPage: HttpService[F] =
-    new LandingPageService().service
+  private val landingPage: HttpRoutes[IO] =
+    new LandingPageService[IO]().service
 
-  private val service: HttpService[F] =
+  private val service: HttpRoutes[IO] =
     landingPage <+> hapiService
 
-  val config: F[HapiConfig] = for {
-    config <- loadConfigF[F, HapiConfig]
+  private def config(blocker: Blocker): IO[HapiConfig] = for {
+    config <- loadConfigF[IO, HapiConfig](blocker)
     // For LaTiS 2.
-    _      <- Effect[F].delay {
+    _      <- IO {
       System.setProperty("dataset.dir", config.catalogDir)
     }
   } yield config
 
-  override def stream(args: List[String], requestShutdown: F[Unit]): Stream[F, ExitCode] =
-    Stream.eval(config).flatMap {
-      case HapiConfig(mapping, port, _) =>
-        BlazeBuilder[F]
-          .bindHttp(port, "0.0.0.0")
-          .mountService(service, mapping)
-          .serve
+  override def run(args: List[String]): IO[ExitCode] =
+    Blocker[IO].use { blocker =>
+      config(blocker).flatMap {
+        case HapiConfig(mapping, port, _) =>
+          BlazeServerBuilder[IO](ExecutionContext.global)
+            .bindHttp(port, "0.0.0.0")
+            .withHttpApp {
+              Router(mapping -> service).orNotFound
+            }
+            .serve
+            .compile
+            .drain
+      }.as(ExitCode.Success)
     }
 }

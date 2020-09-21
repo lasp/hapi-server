@@ -3,7 +3,7 @@ package lasp.hapi.service
 import cats.effect.Effect
 import cats.implicits._
 import io.circe.syntax._
-import org.http4s.HttpService
+import org.http4s.HttpRoutes
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 
@@ -16,8 +16,8 @@ import org.http4s.dsl.Http4sDsl
  */
 class CatalogService[F[_]: Effect](alg: CatalogAlgebra[F]) extends Http4sDsl[F] {
 
-  val service: HttpService[F] =
-    HttpService[F] {
+  val service: HttpRoutes[F] =
+    HttpRoutes.of[F] {
       case GET -> Root / "hapi" / "catalog" =>
         val res = for {
           version <- HapiService.version.pure[F]

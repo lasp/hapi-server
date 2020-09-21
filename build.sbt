@@ -1,8 +1,8 @@
 ThisBuild / organization := "lasp"
 ThisBuild / scalaVersion := "2.12.7"
 
-val http4sVersion     = "0.18.17"
-val pureconfigVersion = "0.9.2"
+val http4sVersion     = "0.21.7"
+val pureconfigVersion = "0.13.0"
 
 lazy val `hapi-server` = (project in file("."))
   .enablePlugins(DockerPlugin)
@@ -12,7 +12,7 @@ lazy val `hapi-server` = (project in file("."))
   .settings(assemblySettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.circe"              %% "circe-generic"          % "0.9.3",
+      "io.circe"              %% "circe-generic"          % "0.13.0",
       "org.http4s"            %% "http4s-blaze-server"    % http4sVersion,
       "org.http4s"            %% "http4s-circe"           % http4sVersion,
       "org.http4s"            %% "http4s-dsl"             % http4sVersion,

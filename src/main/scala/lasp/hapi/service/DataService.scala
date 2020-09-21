@@ -5,10 +5,11 @@ import cats.effect.Effect
 import cats.implicits._
 import fs2.Stream
 import io.circe.syntax._
-import org.http4s.HttpService
+import org.http4s.MediaType
+import org.http4s.HttpRoutes
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
-import org.http4s.MediaType
+import org.http4s.headers.`Content-Type`
 import org.log4s._
 
 /** Implements the `/data` endpoint. */
@@ -21,8 +22,8 @@ class DataService[F[_]: Effect](
 
  private[this] val logger = getLogger
 
-  val service: HttpService[F] =
-    HttpService[F] {
+  val service: HttpRoutes[F] =
+    HttpRoutes.of[F] {
       case GET -> Root / "hapi" / "data"
           :? IdMatcher(_id)
           +& MinTimeMatcher(_minTime)
@@ -72,7 +73,7 @@ class DataService[F[_]: Effect](
               logger.info(err.message)
               BadRequest(HapiError(err).asJson)
           },
-          rs  => Ok(rs).map(_.withType(MediaType.`text/csv`))
+          rs  => Ok(rs).map(_.withContentType(`Content-Type`(MediaType.text.csv)))
         ).flatten
       // Return a 1400 error if the required parameters are not given.
       case GET -> Root / "hapi" / "data" :? _ =>

@@ -1,7 +1,7 @@
 package lasp.hapi.service
 
 import cats.effect.Effect
-import org.http4s.HttpService
+import org.http4s.HttpRoutes
 import org.http4s.dsl.Http4sDsl
 import org.http4s.scalatags._
 import scalatags.Text.all._
@@ -38,8 +38,8 @@ class LandingPageService[F[_]: Effect] extends Http4sDsl[F] {
       )
     )
 
-  val service: HttpService[F] =
-    HttpService[F] {
+  val service: HttpRoutes[F] =
+    HttpRoutes.of[F] {
       case GET -> Root / "hapi" =>
         Ok(landingPage)
     }

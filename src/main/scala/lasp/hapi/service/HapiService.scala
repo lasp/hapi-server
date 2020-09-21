@@ -1,10 +1,12 @@
 package lasp.hapi.service
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
-import cats.effect.Effect
+import cats.effect.ContextShift
+import cats.effect.IO
 import cats.implicits._
-import org.http4s.HttpService
+import org.http4s.HttpRoutes
 import org.http4s.server.middleware.CORS
 import org.http4s.server.middleware.CORSConfig
 import org.http4s.server.middleware.Logger
@@ -26,7 +28,10 @@ import org.http4s.server.middleware.Logger
  * @constructor Create a HAPI service with the given interpreter.
  * @param interpreter interpreter for HAPI algebras
  */
-class HapiService[F[_]: Effect](interpreter: HapiInterpreter[F]) {
+class HapiService(interpreter: HapiInterpreter[IO]) {
+
+  private implicit val cs: ContextShift[IO] =
+    IO.contextShift(ExecutionContext.global)
 
   private val corsConfig: CORSConfig = CORSConfig(
     anyOrigin        = true,
@@ -38,15 +43,15 @@ class HapiService[F[_]: Effect](interpreter: HapiInterpreter[F]) {
   )
 
   /** A service composed of all four required HAPI endpoints. */
-  val service: HttpService[F] = {
+  val service: HttpRoutes[IO] = {
     // If you see a red squiggly here it's probably a lie.
     val service = {
-      new CapabilitiesService[F].service         <+>
-      new InfoService[F](interpreter).service    <+>
-      new CatalogService[F](interpreter).service <+>
-      new DataService[F](interpreter).service
+      new CapabilitiesService[IO].service         <+>
+      new InfoService[IO](interpreter).service    <+>
+      new CatalogService[IO](interpreter).service <+>
+      new DataService[IO](interpreter).service
     }
-    Logger(true, false)(
+    Logger.httpRoutes(true, false)(
       CORS(service, corsConfig)
     )
   }

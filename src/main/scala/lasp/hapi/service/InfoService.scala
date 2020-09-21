@@ -3,7 +3,7 @@ package lasp.hapi.service
 import cats.effect.Effect
 import cats.implicits._
 import io.circe.syntax._
-import org.http4s.HttpService
+import org.http4s.HttpRoutes
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.log4s._
@@ -14,8 +14,8 @@ class InfoService[F[_]: Effect](alg: InfoAlgebra[F]) extends Http4sDsl[F] {
 
   private[this] val logger = getLogger
 
-  val service: HttpService[F] =
-    HttpService[F] {
+  val service: HttpRoutes[F] =
+    HttpRoutes.of[F] {
       case GET -> Root / "hapi" / "info"
           :? IdMatcher(id)
           +& ParamMatcher(params) =>
