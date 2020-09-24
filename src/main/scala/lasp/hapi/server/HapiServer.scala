@@ -8,6 +8,7 @@ import org.http4s.HttpRoutes
 import org.http4s.implicits._
 import org.http4s.server.Router
 import org.http4s.server.blaze._
+import org.http4s.server.middleware.AutoSlash
 import pureconfig.generic.auto._
 import pureconfig.module.catseffect._
 
@@ -33,7 +34,7 @@ abstract class HapiServerApp(interpreter: HapiInterpreter[IO]) extends IOApp {
     new LandingPageService[IO]().service
 
   private val service: HttpRoutes[IO] =
-    landingPage <+> hapiService
+    AutoSlash.httpRoutes(landingPage) <+> hapiService
 
   private def config(blocker: Blocker): IO[HapiConfig] = for {
     config <- loadConfigF[IO, HapiConfig](blocker)
