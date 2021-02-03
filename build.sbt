@@ -27,7 +27,7 @@ lazy val `hapi-server` = (project in file("."))
   )
 
 lazy val latis2 = ProjectRef(
-  uri("git://github.com/latis-data/latis.git#78e60aeb5387a047ceb99db56a1bd49786100904"),
+  uri("git://github.com/latis-data/latis.git#3cc53a58bb870336e5eb5aec08ccf1fa37ef5f3a"),
   "latis"
 )
 
