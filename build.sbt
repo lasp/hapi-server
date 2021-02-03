@@ -1,5 +1,5 @@
 ThisBuild / organization := "lasp"
-ThisBuild / scalaVersion := "2.12.7"
+ThisBuild / scalaVersion := "2.12.13"
 
 val http4sVersion     = "0.21.7"
 val pureconfigVersion = "0.13.0"
