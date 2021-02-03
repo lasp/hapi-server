@@ -19,7 +19,7 @@ class DataServiceSpec extends FlatSpec {
     val req = Request[IO](Method.GET, uri)
 
     val body = service.orNotFound(req).flatMap { res =>
-      res.bodyAsText.compile.toList.map(_.head)
+      res.bodyText.compile.toList.map(_.head)
     }.unsafeRunSync
 
     assert(body == HapiError(status).asJson.noSpaces)

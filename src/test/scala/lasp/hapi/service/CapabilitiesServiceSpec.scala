@@ -28,7 +28,7 @@ class CapabilitiesServiceSpec extends FlatSpec {
       // False error
       capabilities.service.orNotFound(req).flatMap { res =>
         // The stream ought to contain only the body.
-        res.bodyAsText.compile.toList.map(_.head)
+        res.bodyText.compile.toList.map(_.head)
       }.unsafeRunSync
     }
     assert(body == expected.noSpaces)
