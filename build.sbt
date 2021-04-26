@@ -6,11 +6,11 @@ val nexus = "https://artifacts.pdmz.lasp.colorado.edu/repository/"
 val http4sVersion = "0.21.22"
 val latisVersion = "322efe5e"
 
-//lazy val `latis3-hapi` = ProjectRef(file("../latis3-hapi"), "hapi")
+lazy val `latis3-hapi` = ProjectRef(file("../latis3-hapi"), "hapi")
 
 lazy val root = (project in file("."))
   .settings(compilerFlags)
-  //.dependsOn(`latis3-hapi`)
+  .dependsOn(`latis3-hapi`)
   .settings(
     name := "hapi-server",
     libraryDependencies ++= Seq(
@@ -18,7 +18,7 @@ lazy val root = (project in file("."))
       "com.github.latis-data.latis3" %% "latis3-service-interface" % latisVersion,
       "com.github.latis-data.latis3" %% "latis3-server"            % latisVersion,
       "com.github.latis-data.latis3" %% "dap2-service-interface"   % latisVersion,
-      //"com.github.latis-data"        %% "latis3-hapi"              % "59f1d239",
+      //"com.github.latis-data"         % "latis3-hapi"              % "updates-SNAPSHOT", //TODO: update once PR gets merged
       "org.http4s"                   %% "http4s-dsl"               % http4sVersion % Provided,
       "org.http4s"                   %% "http4s-circe"             % http4sVersion,
       "org.http4s"                   %% "http4s-scalatags"         % http4sVersion,
