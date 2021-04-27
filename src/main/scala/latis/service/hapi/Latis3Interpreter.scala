@@ -4,8 +4,8 @@ import cats.effect.IO
 import cats.data.EitherT
 import cats.data.NonEmptyList
 import cats.implicits._
-import fs2.Stream
 
+import fs2.Stream
 import latis.input.DatasetResolver
 import latis.model.Function
 import latis.model.Scalar
@@ -14,14 +14,17 @@ import latis.ops.Selection
 import latis.ops.ToHapiTime
 import latis.ops.UnaryOperation
 import latis.output.CsvEncoder
-import latis.time.{ Time => LTime }
+import latis.time.{Time => LTime}
 import latis.util.HapiUtils._
+import latis.util.dap2.parser.ast._
+import latis.util.Identifier
+import latis.util.Identifier.IdentifierStringContext
 
 class Latis3Interpreter extends HapiInterpreter[IO] {
 
   type T = latis.dataset.Dataset
 
-  override val getCatalog: IO[List[Dataset]] = IO.fromTry {
+  override val getCatalog: IO[List[Dataset]] = IO.fromTry {d
     DatasetResolver.getDatasetIds.map(_.map(id => Dataset(id, id)).toList)
   }
 
@@ -61,15 +64,15 @@ class Latis3Interpreter extends HapiInterpreter[IO] {
     // Header and format are handled by DataService.
     case DataRequest(id, minT, maxT, params, _, _) =>
       val ops: List[UnaryOperation] = List(
-        Selection(s"time >= $minT"),
-        Selection(s"time < $maxT")
+        Selection(id"time", GtEq, s"$minT"),
+        Selection(id"time", Lt, s"$maxT")
       ) ++ makeProjection(params)
 
       getDataset(id, ops)
   }
 
   override def writeData(data: T): Stream[IO, String] =
-    new CsvEncoder().encode(data)
+    CsvEncoder().encode(data)
 
   private def getDataset(id: String, ops: List[UnaryOperation]): IO[T] = IO {
     val dataset: T = DatasetResolver.getDataset(id)
@@ -134,7 +137,7 @@ class Latis3Interpreter extends HapiInterpreter[IO] {
       MetadataError("Parameter missing metadata property 'units'")
     )
   } yield Parameter(
-    s.id,
+    s.id.fold("")(_.asString),
     ty,
     None,
     units,
@@ -169,9 +172,10 @@ class Latis3Interpreter extends HapiInterpreter[IO] {
   private def makeProjection(params: Option[NonEmptyList[String]]): List[UnaryOperation] =
     params.map { ps =>
       val names: List[String] = "time" :: ps.toList
-      List(Projection(names:_*))
+      List(Projection(names.mkString(",")))
     }.getOrElse(List.empty)
 
-  private def hasVariable(ds: T, vname: String): Boolean =
-    ds.model.findVariable(vname).isDefined
+  private def hasVariable(ds: T, vname: String): Boolean = Identifier.fromString(vname)
+    .fold(false)(ds.model.findVariable(_).isDefined)
+
 }
