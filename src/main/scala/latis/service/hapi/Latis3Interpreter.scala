@@ -6,7 +6,7 @@ import cats.data.NonEmptyList
 import cats.implicits._
 
 import fs2.Stream
-import latis.input.DatasetResolver
+import latis.catalog.Catalog
 import latis.model.Function
 import latis.model.Scalar
 import latis.ops.Projection
@@ -19,14 +19,20 @@ import latis.util.HapiUtils._
 import latis.util.dap2.parser.ast._
 import latis.util.Identifier
 import latis.util.Identifier.IdentifierStringContext
+import latis.util.LatisException
 
-class Latis3Interpreter extends HapiInterpreter[IO] {
+class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
 
   type T = latis.dataset.Dataset
 
-  override val getCatalog: IO[List[Dataset]] = IO.fromTry {d
-    DatasetResolver.getDatasetIds.map(_.map(id => Dataset(id, id)).toList)
-  }
+  override val getCatalog: IO[List[Dataset]] =
+    catalog.datasets.compile.toList.map { dss =>
+      dss.map { ds =>
+        val id = ds.id.fold("")(_.asString)
+        val title = ds.metadata.getProperty("title").getOrElse(id)
+        Dataset(id, title)
+      }
+    }
 
   override def getMetadata(
     id: String,
@@ -75,7 +81,12 @@ class Latis3Interpreter extends HapiInterpreter[IO] {
     CsvEncoder().encode(data)
 
   private def getDataset(id: String, ops: List[UnaryOperation]): IO[T] = IO {
-    val dataset: T = DatasetResolver.getDataset(id)
+    val ident = Identifier.fromString(id).getOrElse {
+      throw LatisException(s"Invalid Identifier: $id")
+    }
+    val dataset: T = catalog.findDataset(ident).unsafeRunSync().getOrElse {
+      throw LatisException(s"Unable to find dataset: $id")
+    }
     ops.foldLeft(dataset)(_.withOperation(_)).withOperation(new ToHapiTime)
   }
 
