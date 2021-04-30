@@ -4,7 +4,7 @@ ThisBuild / scalaVersion := "2.13.5"
 val nexus = "https://artifacts.pdmz.lasp.colorado.edu/repository/"
 
 val http4sVersion = "0.21.22"
-val latisVersion = "322efe5e"
+val latisVersion = "91b09198"
 
 lazy val `latis3-hapi` = ProjectRef(file("../latis3-hapi"), "hapi")
 
