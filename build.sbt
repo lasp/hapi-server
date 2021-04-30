@@ -6,7 +6,7 @@ val nexus = "https://artifacts.pdmz.lasp.colorado.edu/repository/"
 val http4sVersion = "0.21.22"
 val latisVersion = "91b09198"
 
-lazy val `latis3-hapi` = ProjectRef(file("../latis3-hapi"), "hapi")
+lazy val `latis3-hapi` = ProjectRef(file("../latis3-hapi"), "hapi") //TODO: pull from jitpack once PR gets merged
 
 lazy val root = (project in file("."))
   .settings(compilerFlags)
@@ -28,8 +28,6 @@ lazy val root = (project in file("."))
       "ch.qos.logback"                % "logback-classic"          % "1.2.3"
     ),
     resolvers ++= Seq(
-      "Nexus Release" at nexus + "web-releases",
-      "Nexus Snapshot" at nexus + "web-snapshots",
       "Unidata" at "https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases",
       "jitpack" at "https://jitpack.io"
     )
