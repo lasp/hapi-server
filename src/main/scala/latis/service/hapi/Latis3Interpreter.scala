@@ -80,15 +80,13 @@ class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
   override def writeData(data: T): Stream[IO, String] =
     CsvEncoder().encode(data)
 
-  private def getDataset(id: String, ops: List[UnaryOperation]): IO[T] = IO {
-    val ident = Identifier.fromString(id).getOrElse {
-      throw LatisException(s"Invalid Identifier: $id")
+  private def getDataset(id: String, ops: List[UnaryOperation]): IO[T] = for {
+    ident   <- IO.fromOption(Identifier.fromString(id))(UnknownId(id))
+    dataset <- catalog.findDataset(ident).flatMap {
+      case Some(ds) => ds.pure[IO]
+      case None     => IO.raiseError(UnknownId(id))
     }
-    val dataset: T = catalog.findDataset(ident).unsafeRunSync().getOrElse {
-      throw LatisException(s"Unable to find dataset: $id")
-    }
-    ops.foldLeft(dataset)(_.withOperation(_)).withOperation(new ToHapiTime)
-  }
+  } yield ops.foldLeft(dataset)(_.withOperation(_)).withOperation(new ToHapiTime)
 
   private def getDatasetMetadata(ds: T): Either[InfoError, Metadata] = for {
     model  <- Either.catchNonFatal(ds.model).leftMap(_ => UnsupportedDataset(""))
