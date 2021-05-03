@@ -1,8 +1,6 @@
 ThisBuild / organization := "io.latis-data"
 ThisBuild / scalaVersion := "2.13.5"
 
-val nexus = "https://artifacts.pdmz.lasp.colorado.edu/repository/"
-
 val http4sVersion = "0.21.22"
 val latisVersion = "91b09198"
 
@@ -40,7 +38,6 @@ lazy val compilerFlags = Seq(
     "-feature",
     "-language:higherKinds",
     "-unchecked",
-    "-Xfuture",
     "-Xlint:-unused,_",
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
