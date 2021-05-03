@@ -181,7 +181,7 @@ class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
   private def makeProjection(params: Option[NonEmptyList[String]]): List[UnaryOperation] =
     params.map { ps =>
       val names: List[String] = "time" :: ps.toList
-      List(Projection(names.mkString(",")))
+      List(Projection.fromArgs(names).fold(throw _, identity))
     }.getOrElse(List.empty)
 
   private def hasVariable(ds: T, vname: String): Boolean = Identifier.fromString(vname)
