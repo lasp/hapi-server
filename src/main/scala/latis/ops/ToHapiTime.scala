@@ -40,12 +40,10 @@ class ToHapiTime extends MapOperation {
         Time(md)
       }
 
-      Either.catchOnly[LatisException] {
-        tHapi.fold(
-          _ => throw LatisException("Failed to apply to model"),
-          Function(_, r)
-        )
-      }
+      tHapi.fold(
+        _ => Left(LatisException("Failed to apply to model")),
+        time => Right(Function(time, r))
+      )
     case _ => Left(LatisException("Failed to apply to model"))
   }
 
