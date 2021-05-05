@@ -4,11 +4,8 @@ ThisBuild / scalaVersion := "2.13.5"
 val http4sVersion = "0.21.22"
 val latisVersion = "91b09198"
 
-lazy val `latis3-hapi` = ProjectRef(file("../latis3-hapi"), "hapi") //TODO: pull from jitpack once PR gets merged
-
 lazy val root = (project in file("."))
   .settings(compilerFlags)
-  .dependsOn(`latis3-hapi`)
   .settings(
     name := "hapi-server",
     libraryDependencies ++= Seq(
@@ -16,7 +13,7 @@ lazy val root = (project in file("."))
       "com.github.latis-data.latis3" %% "latis3-service-interface" % latisVersion,
       "com.github.latis-data.latis3" %% "latis3-server"            % latisVersion,
       "com.github.latis-data.latis3" %% "dap2-service-interface"   % latisVersion,
-      //"com.github.latis-data"         % "latis3-hapi"              % "updates-SNAPSHOT", //TODO: update once PR gets merged
+      "com.github.latis-data"         % "latis3-hapi"              % "4427515e",
       "org.http4s"                   %% "http4s-dsl"               % http4sVersion % Provided,
       "org.http4s"                   %% "http4s-circe"             % http4sVersion,
       "org.http4s"                   %% "http4s-scalatags"         % http4sVersion,
