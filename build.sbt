@@ -1,25 +1,30 @@
 ThisBuild / organization := "io.latis-data"
-ThisBuild / scalaVersion := "2.12.8"
+ThisBuild / scalaVersion := "2.13.5"
 
-val http4sVersion = "0.20.13"
+val http4sVersion = "0.21.22"
+val latisVersion = "91b09198"
 
 lazy val root = (project in file("."))
   .settings(compilerFlags)
   .settings(
     name := "hapi-server",
     libraryDependencies ++= Seq(
-      "io.latis-data" %% "latis3-core" % "0.1.0-SNAPSHOT",
-      "io.latis-data" %% "latis3-service-interface" % "0.1.0-SNAPSHOT",
-      "io.latis-data" %% "latis3-server" % "0.1.0-SNAPSHOT",
-      "io.latis-data" %% "latis3-hapi" % "0.1.0-SNAPSHOT",
-      "io.latis-data" %% "dap2-service-interface" % "0.1.0-SNAPSHOT",
-      "org.http4s" %% "http4s-dsl" % http4sVersion % Provided,
-      "org.http4s" %% "http4s-circe" % http4sVersion,
-      "org.http4s" %% "http4s-scalatags" % http4sVersion,
-      "io.circe" %% "circe-generic" % "0.12.3",
+      "com.github.latis-data.latis3" %% "latis3-core"              % latisVersion,
+      "com.github.latis-data.latis3" %% "latis3-service-interface" % latisVersion,
+      "com.github.latis-data.latis3" %% "latis3-server"            % latisVersion,
+      "com.github.latis-data.latis3" %% "dap2-service-interface"   % latisVersion,
+      "com.github.latis-data"         % "latis3-hapi"              % "4427515e",
+      "org.http4s"                   %% "http4s-dsl"               % http4sVersion % Provided,
+      "org.http4s"                   %% "http4s-circe"             % http4sVersion,
+      "org.http4s"                   %% "http4s-scalatags"         % http4sVersion,
+      "io.circe"                     %% "circe-generic"            % "0.13.0",
       // coursier only seems to include compile dependencies when
       // building a standalone executable (see coursier/coursier#552)
-      "ch.qos.logback" % "logback-classic" % "1.2.3"
+      "ch.qos.logback"                % "logback-classic"          % "1.2.3"
+    ),
+    resolvers ++= Seq(
+      "Unidata" at "https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases",
+      "jitpack" at "https://jitpack.io"
     )
   )
 
@@ -30,9 +35,7 @@ lazy val compilerFlags = Seq(
     "-feature",
     "-language:higherKinds",
     "-unchecked",
-    "-Xfuture",
     "-Xlint:-unused,_",
-    "-Ypartial-unification",
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
     "-Ywarn-unused",

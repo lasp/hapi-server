@@ -7,6 +7,8 @@ import cats.effect.IO
 import cats.implicits._
 import org.http4s.HttpRoutes
 
+import latis.catalog.Catalog
+
 // TODO: Would this be better in latis.service?
 //
 // That way, the package could be:
@@ -25,7 +27,7 @@ import latis.server.ServiceInterface
  * those four endpoints and a landing page and exposes them as a
  * single service that implements the HAPI spec.
  */
-class HapiService extends ServiceInterface {
+class HapiService(catalog: Catalog) extends ServiceInterface(catalog) {
 
   // TODO: We want to get this from the server.
   private implicit val cs: ContextShift[IO] =
@@ -33,7 +35,7 @@ class HapiService extends ServiceInterface {
 
   /** A service composed of all four required HAPI endpoints. */
   override def routes: HttpRoutes[IO] = {
-    val interpreter = new Latis3Interpreter
+    val interpreter = new Latis3Interpreter(catalog)
 
     val service = {
       new LandingPageService[IO].service          <+>

@@ -1,7 +1,7 @@
 package latis.service.hapi
 
 /** Base trait for errors returned by the info service. */
-sealed trait InfoError
+sealed trait InfoError extends Throwable
 
 /** Error for unknown dataset IDs. */
 final case class UnknownId(id: String) extends InfoError

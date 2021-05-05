@@ -11,11 +11,12 @@ object HapiUtils {
 
   /** Convert a time value to a HAPI time given its original units. */
   def toHapiTime(fmt: String, value: String): Either[InfoError, String] = for {
-    fromTime <- Either.catchNonFatal(TimeFormat(fmt))
-    .flatMap(_.parse(value).map(_.toDouble))
-    .orElse(Either.catchNonFatal(value.toDouble))
-    .leftMap(_ => MetadataError("Unsupported time units"))
-    scale     = TimeScale(fmt)
+    fromTime <- TimeFormat.fromExpression(fmt)
+      .flatMap(_.parse(value).map(_.toDouble))
+      .orElse(Either.catchNonFatal(value.toDouble))
+      .leftMap(_ => MetadataError("Unsupported time units"))
+    scale    <- TimeScale.fromExpression(fmt)
+      .leftMap(_ => MetadataError("Unsupported time units"))
     converter = UnitConverter(scale, TimeScale.Default)
     toTime    = converter.convert(fromTime).toLong
   } yield TimeFormat.formatIso(toTime)

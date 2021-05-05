@@ -4,7 +4,6 @@ import cats.implicits._
 
 import latis.data.Number
 import latis.data.Sample
-import latis.data.SampledFunction
 import latis.data.Text
 import latis.metadata.Metadata
 import latis.model._
@@ -15,6 +14,7 @@ import latis.time.TimeFormat
 import latis.time.TimeScale
 import latis.units.UnitConverter
 import latis.util.HapiUtils
+import latis.util.LatisException
 
 /**
  * An operation that converts a time variable to HAPI time strings.
@@ -23,10 +23,10 @@ import latis.util.HapiUtils
  * served via the HAPI interface, it assumes that the outermost domain
  * variable is time.
  */
-class ToHapiTime extends UnaryOperation {
+class ToHapiTime extends MapOperation {
 
   // Convert the units and coverage in the time metadata.
-  override def applyToModel(model: DataType): DataType = model match {
+  override def applyToModel(model: DataType): Either[LatisException, DataType] = model match {
     case Function(t: Time, r) =>
       val tHapi: Either[InfoError, Time] = for {
         fmt  <- getMetadata(t, "units")
@@ -41,42 +41,40 @@ class ToHapiTime extends UnaryOperation {
       }
 
       tHapi.fold(
-        _ => throw new RuntimeException("Failed to apply to model"),
-        Function(_, r)
+        _ => Left(LatisException("Failed to apply to model")),
+        time => Right(Function(time, r))
       )
-    case _ => throw new RuntimeException("Failed to apply to model")
+    case _ => Left(LatisException("Failed to apply to model"))
   }
 
   // Convert the first Data in the domain (assumed to be time, because
   // this is for HAPI).
-  override def applyToData(data: SampledFunction, model: DataType): SampledFunction = {
+  override def mapFunction(model: DataType): Sample => Sample = {
     val time: Time = model match {
       case Function(t: Time, _) => t
-      case _ => throw new RuntimeException("Failed to apply to data")
+      case _ => throw new RuntimeException("Failed to create map function: domain is not time")
     }
+    val converter = UnitConverter(time.timeScale, TimeScale.Default)
 
-    if (time.timeFormat.map(_ != TimeFormat.Iso).getOrElse(true)) {
-      val converter = UnitConverter(time.timeScale, TimeScale.Default)
-      data.map(mkMapFunction(converter, time))
-    } else data
-  }
+    if (!time.timeFormat.contains(TimeFormat.Iso)) {
+      case Sample(Number(t) :: rest, r) =>
+        val tC = converter.convert(t).toLong
+        val tF = TimeFormat.formatIso(tC)
 
-  private def mkMapFunction(converter: UnitConverter, dt: Time): Sample => Sample = {
-    case Sample(Number(t) :: rest, r) =>
-      val tC = converter.convert(t).toLong
-      val tF = TimeFormat.formatIso(tC)
+        Sample(tF :: rest, r)
+      case Sample(Text(t) :: rest, r)   =>
+        val fmt = time.timeFormat.getOrElse {
+          throw new LatisException("Failed to create map function: TimeFormat not found")
+        }
+        val tD = fmt.parse(t).fold(throw _, _.toDouble)
+        val tC = converter.convert(tD).toLong
+        val tF = TimeFormat.formatIso(tC)
 
-      Sample(tF :: rest, r)
-    case Sample(Text(t) :: rest, r)   =>
-      val fmt = dt.timeFormat.getOrElse {
-        throw new RuntimeException("Failed to apply to data")
-      }
-      val tD = fmt.parse(t).fold(throw _, _.toDouble)
-      val tC = converter.convert(tD).toLong
-      val tF = TimeFormat.formatIso(tC)
-
-      Sample(tF :: rest, r)
-    case _ => throw new RuntimeException("Failed to apply to data")
+        Sample(tF :: rest, r)
+      case _ => throw new LatisException("Failed to create map function: invalid Sample")
+    } else {
+      s: Sample => s
+    }
   }
 
   private def getMetadata(dt: DataType, key: String): Either[MetadataError, String] =
