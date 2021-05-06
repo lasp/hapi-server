@@ -7,17 +7,17 @@ import cats.data.NonEmptyList
 /**
  * Represents a request for data.
  *
- * @param id HAPI dataset ID
- * @param minTime lower time bound (inclusive)
- * @param maxTime upper time bound (exclusive)
+ * @param dataset HAPI dataset ID
+ * @param startTime lower time bound (inclusive)
+ * @param stopTime upper time bound (exclusive)
  * @param parameters list of parameter names to return
  * @param header whether to include the metadata header
  * @param format output format
  */
 final case class DataRequest(
-  id: String,
-  minTime: LocalDateTime,
-  maxTime: LocalDateTime,
+  dataset: String,
+  startTime: LocalDateTime,
+  stopTime: LocalDateTime,
   parameters: Option[NonEmptyList[String]],
   header: Boolean,
   format: String

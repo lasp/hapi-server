@@ -17,7 +17,7 @@ class InfoService[F[_]: Concurrent](alg: InfoAlgebra[F]) extends Http4sDsl[F] {
   val service: HttpRoutes[F] =
     HttpRoutes.of[F] {
       case GET -> Root / "info"
-          :? IdMatcher(id)
+          :? DatasetMatcher(id)
           +& ParamMatcher(params) =>
         val ps = params.map(_.distinct)
         alg.getMetadata(id, ps).leftMap {

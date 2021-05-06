@@ -68,10 +68,10 @@ class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
 
   override def getData(req: DataRequest): IO[T] = req match {
     // Header and format are handled by DataService.
-    case DataRequest(id, minT, maxT, params, _, _) =>
+    case DataRequest(id, startT, stopT, params, _, _) =>
       val ops: List[UnaryOperation] = List(
-        Selection(id"time", GtEq, s"$minT"),
-        Selection(id"time", Lt, s"$maxT")
+        Selection(id"time", GtEq, s"$startT"),
+        Selection(id"time", Lt, s"$stopT")
       ) ++ makeProjection(params)
 
       getDataset(id, ops)

@@ -25,18 +25,19 @@ class DataService[F[_]: Concurrent](
   val service: HttpRoutes[F] =
     HttpRoutes.of[F] {
       case GET -> Root / "data"
-          :? IdMatcher(_id)
-          +& MinTimeMatcher(_minTime)
-          +& MaxTimeMatcher(_maxTime)
+          :? DatasetMatcher(_dataset)
+          +& StartTimeMatcher(_startTime)
+          +& StopTimeMatcher(_stopTime)
           +& ParamMatcher(_params)
           +& IncludeMatcher(_inc)
           +& FormatMatcher(_fmt) =>
         val req: Either[Status, DataRequest] =
           for {
-            id      <- _id.asRight
-            minTime <- _minTime.leftMap(_ => Status.`1402`).toEither
-            maxTime <- _maxTime.leftMap(_ => Status.`1403`).toEither
-            _       <- Either.cond(minTime.isBefore(maxTime), (), Status.`1404`)
+            dataset      <- _dataset.asRight
+
+            startTime <- _startTime.leftMap(_ => Status.`1402`).toEither
+            stopTime <- _stopTime.leftMap(_ => Status.`1403`).toEither
+            _       <- Either.cond(startTime.isBefore(stopTime), (), Status.`1404`)
             params  <- Either.cond(
               _params.map(_.count(_ != "time") > 0).getOrElse(true),
               _params,
@@ -48,10 +49,10 @@ class DataService[F[_]: Concurrent](
             fmt     <- _fmt.getOrElse(Format("csv").validNel).bimap(
               _ => Status.`1409`, _.format
             ).toEither
-          } yield DataRequest(id, minTime, maxTime, params, inc, fmt)
+          } yield DataRequest(dataset, startTime, stopTime, params, inc, fmt)
         val records: EitherT[F, Status, Stream[F, String]] = for {
           req     <- EitherT.fromEither[F](req)
-          header  <- alg.getMetadata(_id, _params).leftMap {
+          header  <- alg.getMetadata(_dataset, _params).leftMap {
             case UnknownId(_)          => Status.`1406`
             case UnknownParam(_)       => Status.`1407`
             case err @ MetadataError(_)      => logger.info(err.toString); Status.`1501`
