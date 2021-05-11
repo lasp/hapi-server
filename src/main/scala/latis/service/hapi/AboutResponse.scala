@@ -28,7 +28,8 @@ final case class AboutResponse(
 object AboutResponse {
 
   /** JSON encoder */
-  implicit val encoder: Encoder[AboutResponse] = //TODO: handle optional params better
+  implicit val encoder: Encoder[AboutResponse] =
+    //TODO: don't include empty optional params
     Encoder.forProduct8(
       "version",
       "status",

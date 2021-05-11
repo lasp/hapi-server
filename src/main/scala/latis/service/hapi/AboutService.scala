@@ -12,8 +12,8 @@ class AboutService[F[_]: Concurrent] extends Http4sDsl[F] {
   val service: HttpRoutes[F] =
     HttpRoutes.of[F] {
       case GET -> Root / "about" =>
-        //TODO: handle optional params
         Ok(
+          //TODO: add optional params?
           AboutResponse(
             HapiService.version,
             Status.`1200`,

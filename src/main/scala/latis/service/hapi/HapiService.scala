@@ -21,10 +21,10 @@ import latis.catalog.Catalog
 import latis.server.ServiceInterface
 
 /**
- * A grouping of all four required HAPI endpoints.
+ * A grouping of all five required HAPI endpoints.
  *
- * The HAPI spec defines four required endpoints. This class groups
- * those four endpoints and a landing page and exposes them as a
+ * The HAPI spec defines five required endpoints. This class groups
+ * those five endpoints into a landing page and exposes them as a
  * single service that implements the HAPI spec.
  */
 class HapiService(catalog: Catalog) extends ServiceInterface(catalog) {
@@ -33,12 +33,13 @@ class HapiService(catalog: Catalog) extends ServiceInterface(catalog) {
   private implicit val cs: ContextShift[IO] =
     IO.contextShift(global)
 
-  /** A service composed of all four required HAPI endpoints. */
+  /** A service composed of all five required HAPI endpoints. */
   override def routes: HttpRoutes[IO] = {
     val interpreter = new Latis3Interpreter(catalog)
 
     val service = {
       new LandingPageService[IO].service          <+>
+      new AboutService[IO].service                <+>
       new CapabilitiesService[IO].service         <+>
       new InfoService[IO](interpreter).service    <+>
       new CatalogService[IO](interpreter).service <+>
@@ -52,5 +53,5 @@ class HapiService(catalog: Catalog) extends ServiceInterface(catalog) {
 object HapiService {
 
   /** Version of HAPI spec. */
-  val version: String = "2.1"
+  val version: String = "3.0"
 }
