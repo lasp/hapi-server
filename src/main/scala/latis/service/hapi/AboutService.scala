@@ -19,7 +19,7 @@ class AboutService[F[_]: Concurrent] extends Http4sDsl[F] {
             Status.`1200`,
             "LASP",
             "LASP HAPI Server",
-            "web.support@lasp.colorado.edu" //TODO: get email from config, don't hardcode this
+            "web.support@lasp.colorado.edu" //TODO: get from config, don't hardcode this
           ).asJson
         )
     }
