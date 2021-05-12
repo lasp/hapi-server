@@ -24,8 +24,8 @@ import latis.server.ServiceInterface
  * A grouping of all five required HAPI endpoints.
  *
  * The HAPI spec defines five required endpoints. This class groups
- * those five endpoints into a landing page and exposes them as a
- * single service that implements the HAPI spec.
+ * together those five endpoints and a landing page and exposes them
+ * as a single service that implements the HAPI spec.
  */
 class HapiService(catalog: Catalog) extends ServiceInterface(catalog) {
 
