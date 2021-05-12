@@ -1,6 +1,5 @@
 ThisBuild / organization := "io.latis-data"
 ThisBuild / scalaVersion := "2.13.5"
-reStart / mainClass := Some("latis.server.Latis3Server")
 
 val http4sVersion = "0.21.22"
 val latisVersion = "91b09198"
@@ -26,7 +25,8 @@ lazy val root = (project in file("."))
     resolvers ++= Seq(
       "Unidata" at "https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases",
       "jitpack" at "https://jitpack.io"
-    )
+    ),
+    reStart / mainClass := Some("latis.server.Latis3Server")
   )
 
 lazy val compilerFlags = Seq(
