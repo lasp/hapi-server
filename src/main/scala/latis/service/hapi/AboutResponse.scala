@@ -20,16 +20,35 @@ final case class AboutResponse(
   id: String,
   title: String,
   contact: String,
-  description: String = "",
-  contactId: String = "",
-  citation: String = ""
+  description: Option[String] = None,
+  contactId: Option[String] = None,
+  citation: Option[String] = None
 )
 
 object AboutResponse {
 
   /** JSON encoder */
-  implicit val encoder: Encoder[AboutResponse] =
-    //TODO: don't include empty optional params
+  implicit val encoder: Encoder[AboutResponse] = {
+    val f: AboutResponse => Product8[
+      String,
+      Status,
+      String,
+      String,
+      String,
+      Option[String],
+      Option[String],
+      Option[String]
+    ] = ar => (
+          ar.version,
+          ar.status,
+          ar.id,
+          ar.title,
+          ar.contact,
+          ar.description,
+          ar.contactId,
+          ar.citation
+        )
+
     Encoder.forProduct8(
       "version",
       "status",
@@ -39,15 +58,6 @@ object AboutResponse {
       "description",
       "contactID",
       "citation"
-    ) { x => (
-          x.version,
-          x.status,
-          x.id,
-          x.title,
-          x.contact,
-          x.description,
-          x.contactId,
-          x.citation
-        )
-      }
+    )(f).mapJson(_.dropNullValues)
+  }
 }
