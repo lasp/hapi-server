@@ -41,12 +41,12 @@ class DataService[F[_]: Concurrent](
           // "start" or "time.min",
           // "stop" or "time.max"
           for {
-            name      <- _dataset.getOrElse(_id.getOrElse("")).asRight
-            beginTime <- _startTime.getOrElse(_minTime.getOrElse(LocalDateTime.MAX.invalid))
+            dataset   <- _dataset.getOrElse(_id.getOrElse("")).asRight
+            startTime <- _startTime.getOrElse(_minTime.getOrElse(LocalDateTime.MAX.invalid))
               .leftMap(_ => Status.`1402`).toEither
-            endTime   <- _stopTime.getOrElse(_maxTime.getOrElse(LocalDateTime.MIN.invalid))
+            stopTime  <- _stopTime.getOrElse(_maxTime.getOrElse(LocalDateTime.MIN.invalid))
               .leftMap(_ => Status.`1403`).toEither
-            _         <- Either.cond(beginTime.isBefore(endTime), (), Status.`1404`)
+            _         <- Either.cond(startTime.isBefore(stopTime), (), Status.`1404`)
             params    <- Either.cond(
               _params.map(_.count(_ != "time") > 0).getOrElse(true),
               _params,
@@ -58,12 +58,12 @@ class DataService[F[_]: Concurrent](
             fmt       <- _fmt.getOrElse(Format("csv").validNel).bimap(
               _ => Status.`1409`, _.format
             ).toEither
-          } yield DataRequest(name, beginTime, endTime, params, inc, fmt)
+          } yield DataRequest(dataset, startTime, stopTime, params, inc, fmt)
         }
         val records: EitherT[F, Status, Stream[F, String]] = for {
           req    <- EitherT.fromEither[F](req)
-          name    = _dataset.getOrElse(_id.getOrElse(""))
-          header <- alg.getMetadata(name, _params).leftMap {
+          dataset = _dataset.getOrElse(_id.getOrElse(""))
+          header <- alg.getMetadata(dataset, _params).leftMap {
             case UnknownId(_)          => Status.`1406`
             case UnknownParam(_)       => Status.`1407`
             case err @ MetadataError(_)      => logger.info(err.toString); Status.`1501`

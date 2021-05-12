@@ -21,9 +21,9 @@ class InfoService[F[_]: Concurrent](alg: InfoAlgebra[F]) extends Http4sDsl[F] {
         +& IdMatcher(id)
         +& ParamMatcher(params) =>
         // Allow both "dataset" or "id" for backwards compatibility
-        val name = ds.getOrElse(id.getOrElse(""))
+        val dataset = ds.getOrElse(id.getOrElse(""))
         val ps = params.map(_.distinct)
-        alg.getMetadata(name, ps).leftMap {
+        alg.getMetadata(dataset, ps).leftMap {
           case UnknownId(_)          => Status.`1406`
           case UnknownParam(_)       => Status.`1407`
           case err @ MetadataError(_)      => logger.info(err.toString); Status.`1501`
