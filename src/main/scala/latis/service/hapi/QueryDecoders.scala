@@ -12,9 +12,15 @@ import org.http4s.dsl.io._
 /** Shared query decoders and matchers. */
 object QueryDecoders {
 
-  object DatasetMatcher extends QueryParamDecoderMatcher[String]("dataset")
-  object StartTimeMatcher extends ValidatingQueryParamDecoderMatcher[LocalDateTime]("start")
-  object StopTimeMatcher extends ValidatingQueryParamDecoderMatcher[LocalDateTime]("stop")
+
+  object DatasetMatcher extends OptionalQueryParamDecoderMatcher[String]("dataset")
+  object StartTimeMatcher extends OptionalValidatingQueryParamDecoderMatcher[LocalDateTime]("start")
+  object StopTimeMatcher extends OptionalValidatingQueryParamDecoderMatcher[LocalDateTime]("stop")
+
+  object IdMatcher extends OptionalQueryParamDecoderMatcher[String]("id")
+  object MinTimeMatcher extends OptionalValidatingQueryParamDecoderMatcher[LocalDateTime]("time.min")
+  object MaxTimeMatcher extends OptionalValidatingQueryParamDecoderMatcher[LocalDateTime]("time.max")
+
   object ParamMatcher extends OptionalQueryParamDecoderMatcher[NonEmptyList[String]]("parameters")
 
   /** Decoder for non-empty simple CSV query parameters. */
