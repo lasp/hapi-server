@@ -28,27 +28,7 @@ final case class AboutResponse(
 object AboutResponse {
 
   /** JSON encoder */
-  implicit val encoder: Encoder[AboutResponse] = {
-    val f: AboutResponse => Product8[
-      String,
-      Status,
-      String,
-      String,
-      String,
-      Option[String],
-      Option[String],
-      Option[String]
-    ] = ar => (
-          ar.version,
-          ar.status,
-          ar.id,
-          ar.title,
-          ar.contact,
-          ar.description,
-          ar.contactId,
-          ar.citation
-        )
-
+  implicit val encoder: Encoder[AboutResponse] =
     Encoder.forProduct8(
       "version",
       "status",
@@ -58,6 +38,14 @@ object AboutResponse {
       "description",
       "contactID",
       "citation"
-    )(f).mapJson(_.dropNullValues)
-  }
+    ) { (ar: AboutResponse) => (
+      ar.version,
+      ar.status,
+      ar.id,
+      ar.title,
+      ar.contact,
+      ar.description,
+      ar.contactId,
+      ar.citation
+    ) }.mapJson(_.dropNullValues)
 }
