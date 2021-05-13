@@ -41,11 +41,11 @@ class DataService[F[_]: Concurrent](
           // "start" or "time.min",
           // "stop" or "time.max"
           for {
-            dataset   <- _dataset.getOrElse(_id.getOrElse("")).asRight
-            startTime <- _startTime.getOrElse(_minTime.getOrElse(LocalDateTime.MAX.invalid))
-              .leftMap(_ => Status.`1402`).toEither
-            stopTime  <- _stopTime.getOrElse(_maxTime.getOrElse(LocalDateTime.MIN.invalid))
-              .leftMap(_ => Status.`1403`).toEither
+            dataset   <- Either.fromOption(_dataset <+> _id, Status.`1400`)
+            startTime <- Either.fromOption(_startTime <+> _minTime, Status.`1400`)
+              .flatMap(_.leftMap(_ => Status.`1402`).toEither)
+            stopTime  <- Either.fromOption(_stopTime <+> _maxTime, Status.`1400`)
+              .flatMap(_.leftMap(_ => Status.`1403`).toEither)
             _         <- Either.cond(startTime.isBefore(stopTime), (), Status.`1404`)
             params    <- Either.cond(
               _params.map(_.count(_ != "time") > 0).getOrElse(true),
