@@ -17,30 +17,37 @@ class InfoService[F[_]: Concurrent](alg: InfoAlgebra[F]) extends Http4sDsl[F] {
   val service: HttpRoutes[F] =
     HttpRoutes.of[F] {
       case GET -> Root / "info"
-        :? DatasetMatcher(ds)
-        +& IdMatcher(id)
-        +& ParamMatcher(params) =>
+          :? DatasetMatcher(ds)
+          +& IdMatcher(id)
+          +& ParamMatcher(params) =>
         // Allow both "dataset" or "id" for backwards compatibility
-        val dataset = ds.getOrElse(id.getOrElse(""))
-        val ps = params.map(_.distinct)
-        alg.getMetadata(dataset, ps).leftMap {
-          case UnknownId(_)          => Status.`1406`
-          case UnknownParam(_)       => Status.`1407`
-          case err @ MetadataError(_)      => logger.info(err.toString); Status.`1501`
-          case err @ UnsupportedDataset(_) => logger.info(err.toString); Status.`1501`
-        }.fold(
-          err => err match {
-            case Status.`1406` | Status.`1407` =>
-              logger.info(err.message)
-              NotFound(HapiError(err).asJson)
-            case _ =>
-              logger.info(err.message)
-              InternalServerError(HapiError(err).asJson)
+        Either.fromOption(ds <+> id, Status.`1400`).fold(
+          err => {
+            logger.info(err.message)
+            InternalServerError(HapiError(Status.`1400`).asJson)
           },
-          res => Ok(
-            InfoResponse(HapiService.version, Status.`1200`, res).asJson
-          )
-        ).flatten
+          dataset => {
+            val ps = params.map(_.distinct)
+            alg.getMetadata(dataset, ps).leftMap {
+              case UnknownId(_)        => Status.`1406`
+              case UnknownParam(_)     => Status.`1407`
+              case err@MetadataError(_)      => logger.info(err.toString); Status.`1501`
+              case err@UnsupportedDataset(_) => logger.info(err.toString); Status.`1501`
+            }.fold(
+              err => err match {
+                case Status.`1406` | Status.`1407` =>
+                  logger.info(err.message)
+                  NotFound(HapiError(err).asJson)
+                case _ =>
+                  logger.info(err.message)
+                  InternalServerError(HapiError(err).asJson)
+              },
+              res => Ok(
+                InfoResponse(HapiService.version, Status.`1200`, res).asJson
+              )
+            ).flatten
+          }
+        )
       // Return a 1400 error if the required parameters are not given.
       case GET -> Root / "hapi" / "info" :? _ =>
         logger.info(Status.`1400`.message)
