@@ -48,7 +48,7 @@ class DataService[F[_]: Concurrent](
               .flatMap(_.leftMap(_ => Status.`1403`).toEither)
             _         <- Either.cond(startTime.isBefore(stopTime), (), Status.`1404`)
             params    <- Either.cond(
-              _params.map(_.count(_ != "time") > 0).getOrElse(true),
+              _params.forall(_.count(_ != "time") > 0),
               _params,
               Status.`1501`
             )
