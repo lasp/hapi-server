@@ -19,12 +19,18 @@ class AboutService[F[_]: Concurrent] extends Http4sDsl[F] {
           AboutResponse(
             HapiService.version,
             Status.`1200`,
-            LatisConfig.get("latis.about.id").getOrElse(throw LatisException("No 'id' configured")),
-            LatisConfig.get("latis.about.title").getOrElse(throw LatisException("No 'title' configured")),
-            LatisConfig.get("latis.about.contact").getOrElse(throw LatisException("No 'contact' configured")),
-            LatisConfig.get("latis.about.description"),
-            LatisConfig.get("latis.about.contactId"),
-            LatisConfig.get("latis.about.citation")
+            LatisConfig.get("latis.hapi.about.id").getOrElse {
+              throw LatisException("No 'latis.hapi.about.id' configured")
+            },
+            LatisConfig.get("latis.hapi.about.title").getOrElse {
+              throw LatisException("No 'latis.hapi.about.title' configured")
+            },
+            LatisConfig.get("latis.hapi.about.contact").getOrElse {
+              throw LatisException("No 'latis.hapi.about.contact' configured")
+            },
+            LatisConfig.get("latis.hapi.about.description"),
+            LatisConfig.get("latis.hapi.about.contactId"),
+            LatisConfig.get("latis.hapi.about.citation")
           ).asJson
         )
     }
