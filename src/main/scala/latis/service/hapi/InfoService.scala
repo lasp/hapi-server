@@ -33,12 +33,15 @@ class InfoService[F[_]: Concurrent](alg: InfoAlgebra[F]) extends Http4sDsl[F] {
           }
         } yield metadata).foldF(
           err => err match {
+            case Status.`1400` =>
+              logger.info(err.message)
+              BadRequest(HapiError(err).asJson)
             case Status.`1406` | Status.`1407` =>
               logger.info(err.message)
               NotFound(HapiError(err).asJson)
             case _ =>
               logger.info(err.message)
-              BadRequest(HapiError(err).asJson)
+              InternalServerError(HapiError(err).asJson)
           },
           res => Ok(
             InfoResponse(HapiService.version, Status.`1200`, res).asJson
