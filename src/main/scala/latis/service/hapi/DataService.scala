@@ -62,7 +62,7 @@ class DataService[F[_]: Concurrent](
         }
         val records: EitherT[F, Status, Stream[F, String]] = for {
           req    <- EitherT.fromEither[F](req)
-          dataset = _dataset.getOrElse(_id.getOrElse(""))
+          dataset = req.dataset
           header <- alg.getMetadata(dataset, _params).leftMap {
             case UnknownId(_)          => Status.`1406`
             case UnknownParam(_)       => Status.`1407`
