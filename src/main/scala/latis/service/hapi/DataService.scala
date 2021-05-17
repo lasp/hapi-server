@@ -50,7 +50,7 @@ class DataService[F[_]: Concurrent](
             params    <- Either.cond(
               _params.forall(_.count(_ != "time") > 0),
               _params,
-              Status.`1501`
+              Status.`1400`
             )
             inc       <- _inc.getOrElse(Include(false).validNel).bimap(
               _ => Status.`1410`, _.header
