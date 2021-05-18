@@ -17,6 +17,7 @@ lazy val root = (project in file("."))
       "org.http4s"                   %% "http4s-dsl"               % http4sVersion % Provided,
       "org.http4s"                   %% "http4s-circe"             % http4sVersion,
       "org.http4s"                   %% "http4s-scalatags"         % http4sVersion,
+      "org.scalatest"                %% "scalatest"                % "3.0.8" % Test,
       "io.circe"                     %% "circe-generic"            % "0.13.0",
       // coursier only seems to include compile dependencies when
       // building a standalone executable (see coursier/coursier#552)
@@ -25,7 +26,8 @@ lazy val root = (project in file("."))
     resolvers ++= Seq(
       "Unidata" at "https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases",
       "jitpack" at "https://jitpack.io"
-    )
+    ),
+    reStart / mainClass := Some("latis.server.Latis3Server")
   )
 
 lazy val compilerFlags = Seq(

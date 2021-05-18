@@ -1,5 +1,6 @@
 package latis.service.hapi
 
+import cats.data.EitherT
 import cats.effect.Concurrent
 import cats.implicits._
 import io.circe.syntax._
@@ -17,16 +18,24 @@ class InfoService[F[_]: Concurrent](alg: InfoAlgebra[F]) extends Http4sDsl[F] {
   val service: HttpRoutes[F] =
     HttpRoutes.of[F] {
       case GET -> Root / "info"
-          :? IdMatcher(id)
-          +& ParamMatcher(params) =>
-        val ps = params.map(_.distinct)
-        alg.getMetadata(id, ps).leftMap {
-          case UnknownId(_)          => Status.`1406`
-          case UnknownParam(_)       => Status.`1407`
-          case err @ MetadataError(_)      => logger.info(err.toString); Status.`1501`
-          case err @ UnsupportedDataset(_) => logger.info(err.toString); Status.`1501`
-        }.fold(
+        :? DatasetMatcher(ds)
+        +& IdMatcher(id)
+        +& ParamMatcher(params) =>
+        (for {
+          // Allow both "dataset" or "id" for backwards compatibility
+          dataset  <- EitherT.fromOption[F](ds <+> id, Status.`1400`)
+          ps        = params.map(_.distinct)
+          metadata <- alg.getMetadata(dataset, ps).leftMap {
+            case UnknownId(_)        => Status.`1406`
+            case UnknownParam(_)     => Status.`1407`
+            case err@MetadataError(_)      => logger.info(err.toString); Status.`1501`
+            case err@UnsupportedDataset(_) => logger.info(err.toString); Status.`1501`
+          }
+        } yield metadata).foldF(
           err => err match {
+            case Status.`1400` =>
+              logger.info(err.message)
+              BadRequest(HapiError(err).asJson)
             case Status.`1406` | Status.`1407` =>
               logger.info(err.message)
               NotFound(HapiError(err).asJson)
@@ -37,7 +46,7 @@ class InfoService[F[_]: Concurrent](alg: InfoAlgebra[F]) extends Http4sDsl[F] {
           res => Ok(
             InfoResponse(HapiService.version, Status.`1200`, res).asJson
           )
-        ).flatten
+        )
       // Return a 1400 error if the required parameters are not given.
       case GET -> Root / "hapi" / "info" :? _ =>
         logger.info(Status.`1400`.message)

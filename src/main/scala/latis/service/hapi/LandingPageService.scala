@@ -13,11 +13,15 @@ class LandingPageService[F[_]: Effect] extends Http4sDsl[F] {
     html(
       body(
         h1("LASP HAPI Server"),
-        p("""This server supports the HAPI 2.0 specification for
+        p("""This server supports the HAPI 3.0 specification for
         |delivery of time series data. The server consists of the
-        |following 4 REST-like endpoints that will respond to HTTP GET
+        |following 5 REST-like endpoints that will respond to HTTP GET
         |requests:""".stripMargin.replaceAll("\n", " ")),
         ul(
+          li(
+            a(href := "hapi/about")("about"),
+            " - information about the server"
+          ),
           li(
             a(href := "hapi/capabilities")("capabilities"),
             " - list the output formats the server can emit"
