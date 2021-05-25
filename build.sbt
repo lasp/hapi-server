@@ -13,7 +13,7 @@ lazy val root = (project in file("."))
       "com.github.latis-data.latis3" %% "latis3-service-interface" % latisVersion,
       "com.github.latis-data.latis3" %% "latis3-server"            % latisVersion,
       "com.github.latis-data.latis3" %% "dap2-service-interface"   % latisVersion,
-      "com.github.latis-data"         % "latis3-hapi"              % "4427515e",
+      "com.github.latis-data"         % "latis3-hapi"              % "7d1886b7",
       "org.http4s"                   %% "http4s-dsl"               % http4sVersion % Provided,
       "org.http4s"                   %% "http4s-circe"             % http4sVersion,
       "org.http4s"                   %% "http4s-scalatags"         % http4sVersion,
