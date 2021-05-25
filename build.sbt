@@ -2,7 +2,7 @@ ThisBuild / organization := "io.latis-data"
 ThisBuild / scalaVersion := "2.13.5"
 
 val http4sVersion = "0.21.22"
-val latisVersion = "91b09198"
+val latisVersion = "fc227ee2"
 
 lazy val root = (project in file("."))
   .settings(compilerFlags)
