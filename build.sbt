@@ -1,8 +1,8 @@
 ThisBuild / organization := "io.latis-data"
 ThisBuild / scalaVersion := "2.13.5"
 
-val http4sVersion = "0.21.22"
-val latisVersion = "fc227ee2"
+val http4sVersion = "0.23.0-RC1"
+val latisVersion = "8a72a63"
 
 lazy val root = (project in file("."))
   .settings(compilerFlags)
@@ -13,7 +13,7 @@ lazy val root = (project in file("."))
       "com.github.latis-data.latis3" %% "latis3-service-interface" % latisVersion,
       "com.github.latis-data.latis3" %% "latis3-server"            % latisVersion,
       "com.github.latis-data.latis3" %% "dap2-service-interface"   % latisVersion,
-      "com.github.latis-data"         % "latis3-hapi"              % "7d1886b7",
+      "com.github.latis-data"         % "latis3-hapi"              % "5fb5462",
       "org.http4s"                   %% "http4s-dsl"               % http4sVersion % Provided,
       "org.http4s"                   %% "http4s-circe"             % http4sVersion,
       "org.http4s"                   %% "http4s-scalatags"         % http4sVersion,

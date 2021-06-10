@@ -1,19 +1,14 @@
 package latis.service.hapi
 
-import cats.effect.ContextShift
 import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import io.circe._
 import io.circe.syntax._
 import org.http4s._
 import org.http4s.implicits._
 import org.scalatest.FlatSpec
 
-import scala.concurrent.ExecutionContext
-
 class CapabilitiesServiceSpec extends FlatSpec {
-
-  private implicit val contextShift: ContextShift[IO] =
-    IO.contextShift(ExecutionContext.global)
 
   "The capabilities service" should "advertise CSV only" in {
     val req = Request[IO](Method.GET, uri"/hapi/capabilities")
@@ -35,7 +30,7 @@ class CapabilitiesServiceSpec extends FlatSpec {
       capabilities.service.orNotFound(req).flatMap { res =>
         // The stream ought to contain only the body.
         res.bodyText.compile.toList.map(_.head)
-      }.unsafeRunSync
+      }.unsafeRunSync()
     }
     assert(body == expected.noSpaces)
   }

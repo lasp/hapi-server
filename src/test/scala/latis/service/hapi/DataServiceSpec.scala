@@ -1,8 +1,8 @@
 package latis.service.hapi
 
 import cats.data.NonEmptyList
-import cats.effect.ContextShift
 import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import cats.syntax.all._
 import io.circe.syntax._
 import org.http4s._
@@ -14,12 +14,7 @@ import latis.service.hapi.HapiError._
 import latis.service.hapi.{Status => HStatus}
 import latis.service.hapi.HapiInterpreter.noopInterpreter
 
-import scala.concurrent.ExecutionContext
-
 class DataServiceSpec extends FlatSpec {
-
-  private implicit val contextShift: ContextShift[IO] =
-    IO.contextShift(ExecutionContext.global)
 
   /** Assert GET request to given URI returns a particular status. */
   def assertStatus(uri: Uri, status: HStatus): Assertion = {
@@ -28,7 +23,7 @@ class DataServiceSpec extends FlatSpec {
 
     val body = service.orNotFound(req).flatMap { res =>
       res.bodyText.compile.toList.map(_.head)
-    }.unsafeRunSync
+    }.unsafeRunSync()
 
     assert(body == HapiError(status).asJson.noSpaces)
   }

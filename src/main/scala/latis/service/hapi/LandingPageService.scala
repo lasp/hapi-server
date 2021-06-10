@@ -1,13 +1,13 @@
 package latis.service.hapi
 
-import cats.effect.Effect
+import cats.Monad
 import org.http4s.HttpRoutes
 import org.http4s.dsl.Http4sDsl
 import org.http4s.scalatags._
 import scalatags.Text.all._
 
 /** Implements the HAPI landing page. */
-class LandingPageService[F[_]: Effect] extends Http4sDsl[F] {
+class LandingPageService[F[_]: Monad] extends Http4sDsl[F] {
 
   val landingPage =
     html(

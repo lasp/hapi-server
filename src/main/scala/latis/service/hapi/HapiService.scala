@@ -1,8 +1,5 @@
 package latis.service.hapi
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
-import cats.effect.ContextShift
 import cats.effect.IO
 import cats.implicits._
 import org.http4s.HttpRoutes
@@ -28,10 +25,6 @@ import latis.server.ServiceInterface
  * as a single service that implements the HAPI spec.
  */
 class HapiService(catalog: Catalog) extends ServiceInterface(catalog) {
-
-  // TODO: We want to get this from the server.
-  private implicit val cs: ContextShift[IO] =
-    IO.contextShift(global)
 
   /** A service composed of all five required HAPI endpoints. */
   override def routes: HttpRoutes[IO] = {
