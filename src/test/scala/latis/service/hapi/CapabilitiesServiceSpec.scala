@@ -11,7 +11,7 @@ import org.scalatest.FlatSpec
 class CapabilitiesServiceSpec extends FlatSpec {
 
   "The capabilities service" should "advertise CSV only" in {
-    val req = Request[IO](Method.GET, uri"/hapi/capabilities")
+    val req = Request[IO](Method.GET, uri"/capabilities")
 
     val expected = Json.obj(
       ("HAPI", Json.fromString(HapiService.version)),

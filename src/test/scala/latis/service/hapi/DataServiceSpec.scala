@@ -35,81 +35,81 @@ class DataServiceSpec extends FlatSpec {
 
   "The data service" should "return a 1402 for invalid start times" in {
     assertStatus(
-      uri"/hapi/data?dataset=0&start=invalid&stop=2018Z",
+      uri"/data?dataset=0&start=invalid&stop=2018Z",
       HStatus.`1402`
     )
     assertStatus(
-      uri"/hapi/data?dataset=0&start=invalid&stop=2018Z",
+      uri"/data?dataset=0&start=invalid&stop=2018Z",
       HStatus.`1402`
     )
     assertStatus(
-      uri"/hapi/data?dataset=0&start=invalid&stop=2018Z",
+      uri"/data?dataset=0&start=invalid&stop=2018Z",
       HStatus.`1402`
     )
   }
 
   it should "return a 1403 for invalid stop times" in {
     assertStatus(
-      uri"/hapi/data?dataset=0&start=2018Z&stop=invalid",
+      uri"/data?dataset=0&start=2018Z&stop=invalid",
       HStatus.`1403`
     )
   }
 
   it should "return a 1404 for misordered times" in {
     assertStatus(
-      uri"/hapi/data?dataset=0&start=2018Z&stop=2017Z",
+      uri"/data?dataset=0&start=2018Z&stop=2017Z",
       HStatus.`1404`
     )
   }
 
   it should "return a 1409 for invalid formats" in {
     assertStatus(
-      uri"/hapi/data?dataset=0&start=2017Z&stop=2018Z&format=cats",
+      uri"/data?dataset=0&start=2017Z&stop=2018Z&format=cats",
       HStatus.`1409`
     )
   }
 
   it should "return a 1410 for invalid include settings" in {
     assertStatus(
-      uri"/hapi/data?dataset=0&start=2017Z&stop=2018Z&include=cats",
+      uri"/data?dataset=0&start=2017Z&stop=2018Z&include=cats",
       HStatus.`1410`
     )
   }
 
   it should "be backwards compatible with old param names" in {
     assertStatus(
-      uri"/hapi/data?id=0&time.min=invalid&time.max=2018Z",
+      uri"/data?id=0&time.min=invalid&time.max=2018Z",
       HStatus.`1402`
     )
     assertStatus(
-      uri"/hapi/data?id=0&time.min=invalid&time.max=2018Z",
+      uri"/data?id=0&time.min=invalid&time.max=2018Z",
       HStatus.`1402`
     )
     assertStatus(
-      uri"/hapi/data?id=0&time.min=invalid&time.max=2018Z",
+      uri"/data?id=0&time.min=invalid&time.max=2018Z",
       HStatus.`1402`
     )
     assertStatus(
-      uri"/hapi/data?id=0&time.min=2018Z&time.max=invalid",
+      uri"/data?id=0&time.min=2018Z&time.max=invalid",
       HStatus.`1403`
     )
     assertStatus(
-      uri"/hapi/data?id=0&time.min=2018Z&time.max=2017Z",
+      uri"/data?id=0&time.min=2018Z&time.max=2017Z",
       HStatus.`1404`
     )
     assertStatus(
-      uri"/hapi/data?id=0&time.min=2017Z&time.max=2018Z&format=cats",
+      uri"/data?id=0&time.min=2017Z&time.max=2018Z&format=cats",
       HStatus.`1409`
     )
     assertStatus(
-      uri"/hapi/data?id=0&time.min=2017Z&time.max=2018Z&include=cats",
+      uri"/data?id=0&time.min=2017Z&time.max=2018Z&include=cats",
       HStatus.`1410`
     )
   }
 
   "The 'include' parameter" should "accept 'header'" in {
     val decoded = Include.includeDecoder.decode(QueryParameterValue("header"))
-    decoded.fold(_ => fail, x => assert(x.header))
+    decoded.fold(_ => fail(), x => assert(x.header))
   }
 
   it should "reject other arguments" in {
@@ -120,7 +120,7 @@ class DataServiceSpec extends FlatSpec {
   "The 'format' parameter" should "accept 'csv'" in {
     val fmt = "csv"
     val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
-    decoded.fold(_ => fail, x => assert(x.format == fmt))
+    decoded.fold(_ => fail(), x => assert(x.format == fmt))
   }
 
   // it should "accept 'binary'" in {
@@ -145,7 +145,7 @@ class DataServiceSpec extends FlatSpec {
     val decoded = QueryDecoders.csvDecoder[String].decode(
       QueryParameterValue(params.mkString_("", ",", ""))
     )
-    decoded.fold(_ => fail, x => assert(x == params))
+    decoded.fold(_ => fail(), x => assert(x == params))
   }
 
   it should "reject an empty parameter list" in {

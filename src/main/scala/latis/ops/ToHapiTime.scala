@@ -37,12 +37,12 @@ class ToHapiTime extends MapOperation {
           "units" -> TimeFormat.Iso.toString,
           "coverage" -> s"${covP._1}/${covP._2}"
         )
-        Time(md)
+        Time.fromMetadata(md).fold(throw _, identity)
       }
 
       tHapi.fold(
         _ => Left(LatisException("Failed to apply to model")),
-        time => Right(Function(time, r))
+        time => Function.from(time, r)
       )
     case _ => Left(LatisException("Failed to apply to model"))
   }
@@ -77,9 +77,9 @@ class ToHapiTime extends MapOperation {
     }
   }
 
-  private def getMetadata(dt: DataType, key: String): Either[MetadataError, String] =
+  private def getMetadata(s: Scalar, key: String): Either[MetadataError, String] =
     Either.fromOption(
-      dt.metadata.getProperty(key),
+      s.metadata.getProperty(key),
       MetadataError(s"Missing metadata property $key")
     )
 }
