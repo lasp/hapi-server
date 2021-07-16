@@ -145,7 +145,7 @@ class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
       MetadataError("Parameter missing metadata property 'units'")
     )
   } yield Parameter(
-    s.id.fold("")(_.asString),
+    s.id.asString,
     ty,
     None,
     units,
