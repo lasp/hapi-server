@@ -1,5 +1,5 @@
 ThisBuild / organization := "io.latis-data"
-ThisBuild / scalaVersion := "2.13.5"
+ThisBuild / scalaVersion := "2.13.6"
 
 val http4sVersion = "0.23.0-RC1"
 val latisVersion = "f9c06477"
