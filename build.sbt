@@ -5,7 +5,6 @@ val http4sVersion = "0.23.1"
 val latisVersion = "f9c06477"
 
 lazy val root = (project in file("."))
-  .settings(compilerFlags)
   .settings(
     name := "hapi-server",
     libraryDependencies ++= Seq(
@@ -27,23 +26,6 @@ lazy val root = (project in file("."))
       "Unidata" at "https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases",
       "jitpack" at "https://jitpack.io"
     ),
-    reStart / mainClass := Some("latis.server.Latis3Server")
+    reStart / mainClass := Some("latis.server.Latis3Server"),
+    scalacOptions -= "-Xfatal-warnings"
   )
-
-lazy val compilerFlags = Seq(
-  scalacOptions ++= Seq(
-    "-deprecation",
-    "-encoding", "utf-8",
-    "-feature",
-    "-language:higherKinds",
-    "-unchecked",
-    "-Xlint:-unused,_",
-    "-Ywarn-dead-code",
-    "-Ywarn-numeric-widen",
-    "-Ywarn-unused",
-    "-Ywarn-value-discard"
-  ),
-  Compile / console / scalacOptions --= Seq(
-    "-Ywarn-unused"
-  )
-)
