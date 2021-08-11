@@ -18,7 +18,7 @@ lazy val root = (project in file("."))
       "org.http4s"                   %% "http4s-circe"             % http4sVersion,
       "org.http4s"                   %% "http4s-scalatags"         % http4sVersion,
       "org.scalatest"                %% "scalatest"                % "3.0.8" % Test,
-      "io.circe"                     %% "circe-generic"            % "0.13.0",
+      "io.circe"                     %% "circe-generic"            % "0.14.1",
       // coursier only seems to include compile dependencies when
       // building a standalone executable (see coursier/coursier#552)
       "ch.qos.logback"                % "logback-classic"          % "1.2.3"
