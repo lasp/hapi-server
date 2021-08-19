@@ -54,7 +54,7 @@ class DataService[F[_]: Concurrent](
             inc       <- _inc.getOrElse(Include(false).validNel).bimap(
               _ => Status.`1410`, _.header
             ).toEither
-            fmt       <- _fmt.getOrElse(Format("csv").validNel).bimap(
+            fmt       <- _fmt.getOrElse(Csv.validNel).bimap(
               _ => Status.`1409`, _.format
             ).toEither
           } yield DataRequest(dataset, startTime, stopTime, params, inc, fmt)
