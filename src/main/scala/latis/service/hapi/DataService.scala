@@ -1,12 +1,12 @@
 package latis.service.hapi
 
 import cats.data.EitherT
+import cats.data.NonEmptyList
 import cats.effect.Concurrent
 import cats.implicits._
 import fs2.Stream
 import io.circe.syntax._
-import org.http4s.HttpRoutes
-import org.http4s.MediaType
+import org.http4s.{Status => _, _}
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.headers.`Content-Type`
@@ -20,7 +20,36 @@ class DataService[F[_]: Concurrent](
   import Include._
   import QueryDecoders._
 
- private[this] val logger = getLogger
+  private[this] val logger = getLogger
+
+  private def req2Resp(req: DataRequest, _params:Option[NonEmptyList[String]]): EitherT[F, Status, Response[F]] = {
+    val dataset = req.dataset
+    for {
+      header <- alg.getMetadata(dataset, _params).leftMap {
+        case UnknownId(_) => Status.`1406`
+        case UnknownParam(_) => Status.`1407`
+        case err@MetadataError(_) => logger.info(err.toString); Status.`1501`
+        case err@UnsupportedDataset(_) => logger.info(err.toString); Status.`1501`
+      }.map { md =>
+        "#" ++ InfoResponse(
+          HapiService.version,
+          Status.`1200`,
+          md
+        ).asJson.noSpaces
+      }
+      data <- EitherT.liftF(alg.getData(req))
+      resp <- req.format match {
+        case Csv =>
+          val records = alg.streamCsv(data)
+          val stream: Stream[F, Byte] = if(req.header) Stream.emits((header + "\n").getBytes("UTF-8")) ++ records else records
+          EitherT.right[Status](Ok(stream).map(_.withContentType(`Content-Type`(MediaType.text.csv))))
+        case Binary =>
+          val records = alg.streamBinary(data)
+          val stream: Stream[F, Byte] = if(req.header) Stream.emits(header.getBytes("UTF-8")) ++ records else records
+          EitherT.right[Status](Ok(stream).map(_.withContentType(`Content-Type`(MediaType.application.`octet-stream`))))
+      }
+    } yield resp
+  }
 
   val service: HttpRoutes[F] =
     HttpRoutes.of[F] {
@@ -54,47 +83,22 @@ class DataService[F[_]: Concurrent](
             inc       <- _inc.getOrElse(Include(false).validNel).bimap(
               _ => Status.`1410`, _.header
             ).toEither
-            fmt       <- _fmt.getOrElse(Csv.validNel).bimap(
-              _ => Status.`1409`, _.format
+            fmt       <- _fmt.getOrElse(Csv.validNel).leftMap(
+              _ => Status.`1409`
             ).toEither
           } yield DataRequest(dataset, startTime, stopTime, params, inc, fmt)
         }
-        val records: EitherT[F, Status, Stream[F, String]] = for {
-          req    <- EitherT.fromEither[F](req)
-          dataset = req.dataset
-          header <- alg.getMetadata(dataset, _params).leftMap {
-            case UnknownId(_)          => Status.`1406`
-            case UnknownParam(_)       => Status.`1407`
-            case err @ MetadataError(_)      => logger.info(err.toString); Status.`1501`
-            case err @ UnsupportedDataset(_) => logger.info(err.toString); Status.`1501`
-          }.map { md =>
-            "#" ++ InfoResponse(
-              HapiService.version,
-              Status.`1200`,
-              md
-            ).asJson.noSpaces
-          }
-          data    <- EitherT.liftF(alg.getData(req))
-          records <- EitherT.pure[F, Status](alg.writeData(data))
-        } yield if (req.header) {
-          Stream.emit(header ++ "\n") ++ records
-        } else {
-          records
-        }
-        records.fold(
-          err => err match {
-            case Status.`1406` | Status.`1407` =>
-              logger.info(err.message)
-              NotFound(HapiError(err).asJson)
-            case Status.`1501` =>
-              logger.info(err.message)
-              InternalServerError(HapiError(err).asJson)
-            case _ =>
-              logger.info(err.message)
-              BadRequest(HapiError(err).asJson)
-          },
-          rs  => Ok(rs).map(_.withContentType(`Content-Type`(MediaType.text.csv)))
-        ).flatten
+        EitherT.fromEither[F](req).flatMap(req2Resp(_, _params)).leftSemiflatMap {
+          case err@(Status.`1406` | Status.`1407`) =>
+            logger.info(err.message)
+            NotFound(HapiError(err).asJson)
+          case err@Status.`1501` =>
+            logger.info(err.message)
+            InternalServerError(HapiError(err).asJson)
+          case err =>
+            logger.info(err.message)
+            BadRequest(HapiError(err).asJson)
+        }.merge
       // Return a 1400 error if the required parameters are not given.
       case GET -> Root / "data" :? _ =>
         logger.info(Status.`1400`.message)

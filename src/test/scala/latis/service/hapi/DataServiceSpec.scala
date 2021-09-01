@@ -11,8 +11,8 @@ import org.scalatest.Assertion
 import org.scalatest.FlatSpec
 
 import latis.service.hapi.HapiError._
-import latis.service.hapi.{Status => HStatus}
 import latis.service.hapi.HapiInterpreter.noopInterpreter
+import latis.service.hapi.{Status => HStatus}
 
 class DataServiceSpec extends FlatSpec {
 
@@ -120,19 +120,19 @@ class DataServiceSpec extends FlatSpec {
   "The 'format' parameter" should "accept 'csv'" in {
     val fmt = "csv"
     val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
-    decoded.fold(_ => fail(), x => assert(x.format == fmt))
+    decoded.fold(_ => fail(), x => assert(x == Format.Csv))
   }
 
-  // it should "accept 'binary'" in {
-  //   val fmt = "binary"
-  //   val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
-  //   decoded.fold(_ => fail, x => assert(x.format == fmt))
-  // }
+  it should "accept 'binary'" in {
+    val fmt = "binary"
+    val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
+    decoded.fold(_ => fail(), x => assert(x == Format.Binary))
+  }
 
   // it should "accept 'json'" in {
   //   val fmt = "json"
   //   val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
-  //   decoded.fold(_ => fail, x => assert(x.format == fmt))
+  //   decoded.fold(_ => fail(), x => assert(x == Format.Json))
   // }
 
   it should "reject other arguments" in {

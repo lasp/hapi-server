@@ -1,11 +1,11 @@
 package latis.service.hapi
 
-import cats.effect.IO
 import cats.data.EitherT
 import cats.data.NonEmptyList
+import cats.effect.IO
 import cats.implicits._
-
 import fs2.Stream
+
 import latis.catalog.Catalog
 import latis.model.Function
 import latis.model.Scalar
@@ -13,12 +13,14 @@ import latis.ops.Projection
 import latis.ops.Selection
 import latis.ops.ToHapiTime
 import latis.ops.UnaryOperation
+import latis.output.BinaryEncoder
 import latis.output.CsvEncoder
 import latis.time.{Time => LTime}
 import latis.util.HapiUtils._
-import latis.util.dap2.parser.ast._
 import latis.util.Identifier
 import latis.util.Identifier.IdentifierStringContext
+import latis.util.dap2.parser.ast._
+import latis.util.hapi.DataCodec
 
 class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
 
@@ -76,8 +78,15 @@ class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
       getDataset(id, ops)
   }
 
-  override def writeData(data: T): Stream[IO, String] =
-    CsvEncoder().encode(data)
+  override def streamCsv(data: T): Stream[IO, Byte] = {
+    val x = CsvEncoder().encode(data)
+    x.through(fs2.text.utf8.encode)
+  }
+
+  override def streamBinary(data: T): Stream[IO, Byte] = {
+    val enc: BinaryEncoder = new BinaryEncoder(DataCodec.hapiCodec)
+    enc.encode(data)
+  }
 
   private def getDataset(id: String, ops: List[UnaryOperation]): IO[T] = for {
     ident   <- IO.fromOption(Identifier.fromString(id))(UnknownId(id))
