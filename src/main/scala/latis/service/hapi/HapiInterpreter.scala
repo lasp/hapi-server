@@ -32,7 +32,10 @@ object HapiInterpreter {
       override def getData(req: DataRequest): F[Unit] =
         ().pure[F]
 
-      override def writeData(data: Unit): Stream[F, String] =
+      override def streamCsv(data: Unit): Stream[F, Byte] =
+        Stream.empty
+
+      override def streamBinary(data: Unit): Stream[F, Byte] =
         Stream.empty
     }
 }

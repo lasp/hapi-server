@@ -19,7 +19,15 @@ trait DataAlgebra[F[_]] {
    * Write data as CSV.
    *
    * @param data data to write
-   * @return a stream of CSV records
+   * @return a stream of UTF-8 encoded Bytes
    */
-  def writeData(data: T): Stream[F, String]
+  def streamCsv(data: T): Stream[F, Byte]
+
+  /**
+   * Write data as binary stream.
+   *
+   * @param data data to write
+   * @return a stream of Bytes
+   */
+  def streamBinary(data: T): Stream[F, Byte]
 }

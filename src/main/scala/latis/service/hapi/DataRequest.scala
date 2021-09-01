@@ -20,5 +20,5 @@ final case class DataRequest(
   stopTime: LocalDateTime,
   parameters: Option[NonEmptyList[String]],
   header: Boolean,
-  format: String
+  format: Format
 )
