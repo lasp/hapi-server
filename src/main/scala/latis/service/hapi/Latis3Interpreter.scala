@@ -42,7 +42,7 @@ class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
       // with UnknownId if not found.
       catalog  <- EitherT.liftF(getCatalog)
       _        <- EitherT.cond[IO](
-        catalog.exists(_.title === id),
+        catalog.exists(_.id === id),
         (), UnknownId(id)
       )
       dataset  <- EitherT.liftF(getDataset(id, List()))
