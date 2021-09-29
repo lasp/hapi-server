@@ -5,6 +5,9 @@ import cats.implicits._
 import org.http4s.HttpRoutes
 
 import latis.catalog.Catalog
+import latis.metadata.Metadata
+import latis.model.Function
+import latis.time.Time
 
 // TODO: Would this be better in latis.service?
 //
@@ -26,9 +29,46 @@ import latis.server.ServiceInterface
  */
 class HapiService(catalog: Catalog) extends ServiceInterface(catalog) {
 
+  // The catalog provided by LaTiS contains datasets that cannot be
+  // represented with HAPI, so we filter those datasets out.
+  //
+  // This is a hack to filter out datasets that will obviously not
+  // work. The long-term solution is to rework the HAPI service so
+  // LaTiS datasets are turned into HAPI datasets when possible, and
+  // the ability to construct a HAPI dataset serves as proof that the
+  // LaTiS dataset is compatible with HAPI.
+  //
+  // This checks that:
+  // - The first domain variable is time
+  // - The time has units and coverage
+  // - Each scalar in the range has units and a supported type
+  // - If the type of a scalar is string, its size is defined
+  private val filteredCatalog: Catalog = {
+    val covP: Metadata => Boolean = _.getProperty("coverage").isDefined
+    val typeP: Metadata => Boolean = md => md.getProperty("type").exists {
+      case "string" => md.getProperty("size").isDefined
+      case "double" => true
+      case "int"    => true
+      case _        => false
+    }
+    val unitsP: Metadata => Boolean = _.getProperty("units").isDefined
+
+    catalog.filter {
+      _.model match {
+        case Function(tVar: Time, range) =>
+          val md = tVar.metadata
+          covP(md) && unitsP(md) && range.getScalars.forall { s =>
+            val md = s.metadata
+            typeP(md) && unitsP(md)
+          }
+        case _ => false
+      }
+    }
+  }
+
   /** A service composed of all five required HAPI endpoints. */
   override def routes: HttpRoutes[IO] = {
-    val interpreter = new Latis3Interpreter(catalog)
+    val interpreter = new Latis3Interpreter(filteredCatalog)
 
     val service = {
       new LandingPageService[IO].service          <+>
