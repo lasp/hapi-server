@@ -34,6 +34,7 @@ class ToHapiTime extends MapOperation {
         covP <- HapiUtils.parseCoverage(cov, fmt)
       } yield {
         val md = t.metadata ++ Metadata(
+          "size" -> "24",
           "units" -> TimeFormat.Iso.toString,
           "coverage" -> s"${covP._1}/${covP._2}"
         )

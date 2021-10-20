@@ -30,7 +30,7 @@ class DataServiceSpec extends FlatSpec {
 
   /** Build a simple test DataService[IO] with a time -> int dataset using the Latis3Interpreter*/
   private lazy val dataset = (for {
-    time <- Time.fromMetadata(Metadata("id"->"time", "type"->"string", "size"->"24", "units"->"yyyy-MM-dd", "coverage"->"2000-01-01/2000-01-05"))
+    time <- Time.fromMetadata(Metadata("id"->"time", "type"->"string", "units"->"yyyy-MM-dd", "coverage"->"2000-01-01/2000-01-05"))
     disp <- Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters"))
     model <- Function.from(id"testfunc", time, disp)
     data = new SeqFunction(Seq(
