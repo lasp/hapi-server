@@ -6,9 +6,9 @@ import io.circe._
 import io.circe.syntax._
 import org.http4s._
 import org.http4s.implicits._
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec._
 
-class CapabilitiesServiceSpec extends FlatSpec {
+class CapabilitiesServiceSpec extends AnyFlatSpec {
 
   "The capabilities service" should "advertise CSV and Binary only" in {
     val req = Request[IO](Method.GET, uri"/capabilities")

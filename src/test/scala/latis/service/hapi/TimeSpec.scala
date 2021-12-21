@@ -4,9 +4,9 @@ import java.time.LocalDateTime
 
 import org.scalactic.Equality
 import org.scalatest.Assertion
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec._
 
-class TimeSpec extends FlatSpec {
+class TimeSpec extends AnyFlatSpec {
 
   val expected = LocalDateTime.of(2018, 1, 1, 0, 0, 0)
 
