@@ -20,7 +20,7 @@ lazy val root = (project in file("."))
       "io.circe"                     %% "circe-generic"            % "0.14.1",
       // coursier only seems to include compile dependencies when
       // building a standalone executable (see coursier/coursier#552)
-      "ch.qos.logback"                % "logback-classic"          % "1.2.5"
+      "ch.qos.logback"                % "logback-classic"          % "1.2.8"
     ),
     resolvers ++= Seq(
       "Unidata" at "https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases",
