@@ -2,7 +2,7 @@ package latis.service.hapi
 
 import cats.effect.unsafe.implicits.global
 import org.scalatest.EitherValues._
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec._
 
 import latis.data.DomainData
 import latis.data.RangeData
@@ -14,7 +14,7 @@ import latis.model._
 import latis.ops.ToHapiTime
 import latis.time.Time
 
-class ToHapiTimeSpec extends FlatSpec{
+class ToHapiTimeSpec extends AnyFlatSpec{
 
   private lazy val toHapiTime = new ToHapiTime
 

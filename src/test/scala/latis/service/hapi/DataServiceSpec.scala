@@ -8,7 +8,7 @@ import io.circe.syntax._
 import org.http4s.{Status => _, _}
 import org.http4s.implicits._
 import org.scalatest.Assertion
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec._
 import org.typelevel.ci.CIString
 import scodec.codecs
 
@@ -26,7 +26,7 @@ import latis.service.hapi.{Status => HStatus}
 import latis.time.Time
 import latis.util.Identifier.IdentifierStringContext
 
-class DataServiceSpec extends FlatSpec {
+class DataServiceSpec extends AnyFlatSpec {
 
   /** Build a simple test DataService[IO] with a time -> int dataset using the Latis3Interpreter*/
   private lazy val dataset = (for {

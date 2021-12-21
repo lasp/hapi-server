@@ -1,8 +1,8 @@
 package latis.service.hapi
 
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec._
 
-class CatalogServiceSpec extends FlatSpec {
+class CatalogServiceSpec extends AnyFlatSpec {
 
   "A dataset" should "default to using the ID as the title" in {
     val id = "id"

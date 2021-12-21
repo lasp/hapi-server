@@ -2,9 +2,9 @@ package latis.service.hapi
 
 import io.circe._
 import io.circe.syntax._
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec._
 
-class BinSpec extends FlatSpec {
+class BinSpec extends AnyFlatSpec {
 
   "The Bin encoder" should "keep 'centers' if 'ranges' is not defined" in {
     val bin = Bin("", None, None, "", Option(""))
