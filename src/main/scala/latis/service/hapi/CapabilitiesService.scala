@@ -16,7 +16,7 @@ class CapabilitiesService[F[_]: Concurrent] extends Http4sDsl[F] {
           Capabilities(
             HapiService.version,
             Status.`1200`,
-            List("csv", "binary")
+            List("csv", "binary", "json")
           ).asJson
         )
     }

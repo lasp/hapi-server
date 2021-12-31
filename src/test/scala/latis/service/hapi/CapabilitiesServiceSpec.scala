@@ -19,7 +19,8 @@ class CapabilitiesServiceSpec extends AnyFlatSpec {
       ("outputFormats", Json.fromValues(
         List(
           Json.fromString("csv"),
-          Json.fromString("binary")
+          Json.fromString("binary"),
+          Json.fromString("json")
         )
       ))
     )

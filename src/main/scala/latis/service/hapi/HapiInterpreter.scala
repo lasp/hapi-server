@@ -5,6 +5,7 @@ import cats.data.EitherT
 import cats.data.NonEmptyList
 import cats.implicits._
 import fs2.Stream
+import io.circe.JsonObject
 
 /** Interpreter for the algebras making up the HAPI services. */
 trait HapiInterpreter[F[_]]
@@ -36,6 +37,9 @@ object HapiInterpreter {
         Stream.empty
 
       override def streamBinary(data: Unit): Stream[F, Byte] =
+        Stream.empty
+
+      override def streamJson(data: Unit, header: JsonObject): Stream[F, Byte] =
         Stream.empty
     }
 }
