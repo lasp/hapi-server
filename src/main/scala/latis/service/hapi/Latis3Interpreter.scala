@@ -1,10 +1,17 @@
 package latis.service.hapi
 
+import scala.collection.immutable.ListMap
+
 import cats.data.EitherT
 import cats.data.NonEmptyList
 import cats.effect.IO
 import cats.implicits._
 import fs2.Stream
+import fs2.data.json
+import fs2.data.json.circe.tokenizerForEncoder
+import fs2.text.utf8
+import io.circe.Json
+import io.circe.JsonObject
 
 import latis.catalog.Catalog
 import latis.model.Function
@@ -15,6 +22,7 @@ import latis.ops.ToHapiTime
 import latis.ops.UnaryOperation
 import latis.output.BinaryEncoder
 import latis.output.CsvEncoder
+import latis.output.JsonEncoder
 import latis.time.{Time => LTime}
 import latis.util.HapiUtils._
 import latis.util.Identifier
@@ -86,6 +94,17 @@ class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
   override def streamBinary(data: T): Stream[IO, Byte] = {
     val enc: BinaryEncoder = new BinaryEncoder(DataCodec.hapiCodec)
     enc.encode(data)
+  }
+
+  override def streamJson(data: T, header: JsonObject): Stream[IO, Byte] = {
+    val dataJson = new JsonEncoder().encode(data)
+    val headerList = header.add("format", Json.fromString("json")).toList
+    val map = ListMap(headerList: _*)
+    dataJson
+      .through(json.ast.tokenize)
+      .through(json.wrap.asArrayInObject(at = "data", in = map))
+      .through(json.render.pretty())
+      .through(utf8.encode)
   }
 
   private def getDataset(id: String, ops: List[UnaryOperation]): IO[T] = for {

@@ -31,22 +31,29 @@ class DataService[F[_]: Concurrent](
         case err@MetadataError(_) => logger.info(err.toString); Status.`1501`
         case err@UnsupportedDataset(_) => logger.info(err.toString); Status.`1501`
       }.map { md =>
-        "#" ++ InfoResponse(
+        InfoResponse(
           HapiService.version,
           Status.`1200`,
           md
-        ).asJson.noSpaces
+        ).asJson
       }
       data <- EitherT.liftF(alg.getData(req))
       resp <- req.format match {
         case Csv =>
+          val csvHeader = "#" + header.noSpaces + "\n"
           val records = alg.streamCsv(data)
-          val stream: Stream[F, Byte] = if(req.header) Stream.emits((header + "\n").getBytes("UTF-8")) ++ records else records
+          val stream: Stream[F, Byte] = if(req.header) Stream.emits(csvHeader.getBytes("UTF-8")) ++ records else records
           EitherT.right[Status](Ok(stream).map(_.withContentType(`Content-Type`(MediaType.text.csv))))
         case Binary =>
+          val binHeader = "#" + header.noSpaces
           val records = alg.streamBinary(data)
-          val stream: Stream[F, Byte] = if(req.header) Stream.emits(header.getBytes("UTF-8")) ++ records else records
+          val stream: Stream[F, Byte] = if(req.header) Stream.emits(binHeader.getBytes("UTF-8")) ++ records else records
           EitherT.right[Status](Ok(stream).map(_.withContentType(`Content-Type`(MediaType.application.`octet-stream`))))
+        case Json =>
+          val jsonHeader = header.asObject.get
+          val records = alg.streamJson(data, jsonHeader)
+          val stream: Stream[F, Byte] = records // No dependence on req.header for Json
+          EitherT.right[Status](Ok(stream).map(_.withContentType(`Content-Type`(MediaType.application.`json`))))
       }
     } yield resp
   }

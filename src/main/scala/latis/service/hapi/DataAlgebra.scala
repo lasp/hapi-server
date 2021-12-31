@@ -1,6 +1,7 @@
 package latis.service.hapi
 
 import fs2.Stream
+import io.circe.JsonObject
 
 /** Algebra for reading data. */
 trait DataAlgebra[F[_]] {
@@ -30,4 +31,13 @@ trait DataAlgebra[F[_]] {
    * @return a stream of Bytes
    */
   def streamBinary(data: T): Stream[F, Byte]
+
+  /**
+   * Write data as Json.
+   *
+   * @param data data to write
+   * @param header Json with the header content to prepend to the data
+   * @return a stream of Bytes
+   */
+  def streamJson(data: T, header: JsonObject): Stream[F, Byte]
 }
