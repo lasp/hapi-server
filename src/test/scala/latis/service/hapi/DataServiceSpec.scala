@@ -4,6 +4,7 @@ import cats.data.NonEmptyList
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import cats.syntax.all._
+import io.circe.Json
 import io.circe.syntax._
 import org.http4s.{Status => _, _}
 import org.http4s.implicits._
@@ -158,11 +159,11 @@ class DataServiceSpec extends AnyFlatSpec {
     decoded.fold(_ => fail(), x => assert(x == Format.Binary))
   }
 
-  // it should "accept 'json'" in {
-  //   val fmt = "json"
-  //   val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
-  //   decoded.fold(_ => fail(), x => assert(x == Format.Json))
-  // }
+  it should "accept 'json'" in {
+    val fmt = "json"
+    val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
+    decoded.fold(_ => fail(), x => assert(x == Format.Json))
+  }
 
   it should "reject other arguments" in {
     val decoded = Format.formatDecoder.decode(QueryParameterValue("yolo"))
@@ -237,6 +238,54 @@ class DataServiceSpec extends AnyFlatSpec {
       ).require.toByteArray.toList
       assert(body == testBin)
       assert(contentType == "application/octet-stream")
+    }).unsafeRunSync()
+  }
+
+  it should "correctly generate a response for a json request" in {
+    val req = Request[IO](Method.GET, uri"/data?dataset=testdataset&start=2000-01-01&stop=2000-01-06&format=json")
+    val resp = dataService.orNotFound(req)
+    (for {
+      body <- resp.flatMap { res =>
+        res.body.through(fs2.text.utf8.decode).compile.toList
+      }
+      jsonBody = io.circe.parser.parse(body.mkString).toOption.get
+      contentType = resp.unsafeRunSync().headers.get(CIString("Content-Type")).get.head.value
+    } yield {
+      val testJson = Json.obj(
+        ("HAPI", Json.fromString("3.0")),
+        ("status", Json.obj(
+          ("code", Json.fromInt(1200)),
+          ("message", Json.fromString("OK"))
+        )),
+        ("parameters", Json.arr(
+          Json.obj(
+            ("name", Json.fromString("time")),
+            ("type", Json.fromString("isotime")),
+            ("length", Json.fromInt(24)),
+            ("units", Json.fromString("UTC")),
+            ("fill", Json.Null),
+          ),
+          Json.obj(
+            ("name", Json.fromString("displacement")),
+            ("type", Json.fromString("integer")),
+            ("units", Json.fromString("meters")),
+            ("fill", Json.Null),
+          ),
+        )),
+        ("startDate", Json.fromString("2000-01-01T00:00:00.000Z")),
+        ("stopDate", Json.fromString("2000-01-05T00:00:00.000Z")),
+        ("format", Json.fromString("json")),
+        ("data", Json.arr(
+          Json.arr(Json.fromString("2000-01-01T00:00:00.000Z"), Json.fromInt(1)),
+          Json.arr(Json.fromString("2000-01-02T00:00:00.000Z"), Json.fromInt(5)),
+          Json.arr(Json.fromString("2000-01-03T00:00:00.000Z"), Json.fromInt(4)),
+          Json.arr(Json.fromString("2000-01-04T00:00:00.000Z"), Json.fromInt(2)),
+          Json.arr(Json.fromString("2000-01-05T00:00:00.000Z"), Json.fromInt(0))
+        ))
+      )
+      assert(jsonBody == testJson)
+      assert(jsonBody.spaces2 == testJson.spaces2)
+      assert(contentType == "application/json")
     }).unsafeRunSync()
   }
 }
