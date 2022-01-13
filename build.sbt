@@ -1,6 +1,7 @@
 ThisBuild / organization := "io.latis-data"
 ThisBuild / scalaVersion := "2.13.7"
 
+val fs2DataVersion = "1.3.1"
 val http4sVersion = "0.23.7"
 val latisVersion = "823018c"
 
@@ -20,7 +21,9 @@ lazy val root = (project in file("."))
       "io.circe"                     %% "circe-generic"            % "0.14.1",
       // coursier only seems to include compile dependencies when
       // building a standalone executable (see coursier/coursier#552)
-      "ch.qos.logback"                % "logback-classic"          % "1.2.8"
+      "ch.qos.logback"                % "logback-classic"          % "1.2.8",
+      "org.gnieh"                    %% "fs2-data-json"            % fs2DataVersion,
+      "org.gnieh"                    %% "fs2-data-json-circe"      % fs2DataVersion
     ),
     resolvers ++= Seq(
       "Unidata" at "https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases",
