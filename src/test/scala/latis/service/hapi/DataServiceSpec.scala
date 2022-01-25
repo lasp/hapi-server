@@ -207,11 +207,11 @@ class DataServiceSpec extends AnyFlatSpec {
       }
       contentType = resp.unsafeRunSync().headers.get(CIString("Content-Type")).get.head.value
     } yield {
-      val testStr = "2000-01-01T00:00:00.000Z,1\n" +
-                    "2000-01-02T00:00:00.000Z,5\n" +
-                    "2000-01-03T00:00:00.000Z,4\n" +
-                    "2000-01-04T00:00:00.000Z,2\n" +
-                    "2000-01-05T00:00:00.000Z,0\n"
+      val testStr = "2000-01-01T00:00:00.000Z,1\r\n" +
+                    "2000-01-02T00:00:00.000Z,5\r\n" +
+                    "2000-01-03T00:00:00.000Z,4\r\n" +
+                    "2000-01-04T00:00:00.000Z,2\r\n" +
+                    "2000-01-05T00:00:00.000Z,0\r\n"
       assert(body.mkString == testStr)
       assert(contentType == "text/csv")
     }).unsafeRunSync()

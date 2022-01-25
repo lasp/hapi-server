@@ -54,8 +54,8 @@ class ToHapiTimeSpec extends AnyFlatSpec{
     assert(timeVal.head.toString == "2000-01-01T01:01:01.001Z")
   }
 
-  it should "expand yyyy-ddd" in {
-    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"string", "units"->"yyyy-ddd", "coverage"->"2000-001/2000-002")).value
+  it should "expand yyyy-DDD" in {
+    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"string", "units"->"yyyy-DDD", "coverage"->"2000-001/2000-002")).value
     val disp = Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters")).value
     val model = Function.from(time, disp).value
     val data = new SeqFunction(Seq(
@@ -72,8 +72,8 @@ class ToHapiTimeSpec extends AnyFlatSpec{
     assert(timeVal.head.toString == "2000-01-01T00:00:00.000Z")
   }
 
-  it should "handle full length yyyy-dddTHH:mm:ss.SSSZ" in {
-    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"string", "units"->"yyyy-ddd'T'HH:mm:ss.SSS'Z'", "coverage"->"2000-001T00:00:00.000Z/2000-002T00:00:00.000Z")).value
+  it should "handle full length yyyy-DDDTHH:mm:ss.SSSZ" in {
+    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"string", "units"->"yyyy-DDD'T'HH:mm:ss.SSS'Z'", "coverage"->"2000-001T00:00:00.000Z/2000-002T00:00:00.000Z")).value
     val disp = Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters")).value
     val model = Function.from(time, disp).value
     val data = new SeqFunction(Seq(
@@ -95,7 +95,7 @@ class ToHapiTimeSpec extends AnyFlatSpec{
     val disp = Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters")).value
     val model = Function.from(time, disp).value
     val data = new SeqFunction(Seq(
-      Sample(time.convertValue("3661.001").toSeq, RangeData(1)),
+      Sample(DomainData(3661.001), RangeData(1)),
     ))
     val dataset = new MemoizedDataset(Metadata("id"->"d1"), model, data).withOperation(toHapiTime)
     val metadata = dataset.model.getScalars.head.metadata
@@ -113,7 +113,7 @@ class ToHapiTimeSpec extends AnyFlatSpec{
     val disp = Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters")).value
     val model = Function.from(time, disp).value
     val data = new SeqFunction(Seq(
-      Sample(time.convertValue("3661001").toSeq, RangeData(1)),
+      Sample(DomainData(3661001.0), RangeData(1)),
     ))
     val dataset = new MemoizedDataset(Metadata("id"->"d1"), model, data).withOperation(toHapiTime)
     val metadata = dataset.model.getScalars.head.metadata
@@ -131,7 +131,7 @@ class ToHapiTimeSpec extends AnyFlatSpec{
     val disp = Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters")).value
     val model = Function.from(time, disp).value
     val data = new SeqFunction(Seq(
-      Sample(time.convertValue("946688461.001").toSeq, RangeData(1)),
+      Sample(DomainData(946688461.001), RangeData(1)),
     ))
     val dataset = new MemoizedDataset(Metadata("id"->"d1"), model, data).withOperation(toHapiTime)
     val metadata = dataset.model.getScalars.head.metadata
@@ -149,7 +149,7 @@ class ToHapiTimeSpec extends AnyFlatSpec{
     val disp = Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters")).value
     val model = Function.from(time, disp).value
     val data = new SeqFunction(Seq(
-      Sample(time.convertValue("946688461001").toSeq, RangeData(1)),
+      Sample(DomainData(946688461001.0), RangeData(1)),
     ))
     val dataset = new MemoizedDataset(Metadata("id"->"d1"), model, data).withOperation(toHapiTime)
     val metadata = dataset.model.getScalars.head.metadata
