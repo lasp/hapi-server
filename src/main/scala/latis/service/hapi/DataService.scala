@@ -40,7 +40,7 @@ class DataService[F[_]: Concurrent](
       data <- EitherT.liftF(alg.getData(req))
       resp <- req.format match {
         case Csv =>
-          val csvHeader = "#" + header.noSpaces + "\n"
+          val csvHeader = "#" + header.noSpaces + "\r\n"
           val records = alg.streamCsv(data)
           val stream: Stream[F, Byte] = if(req.header) Stream.emits(csvHeader.getBytes("UTF-8")) ++ records else records
           EitherT.right[Status](Ok(stream).map(_.withContentType(`Content-Type`(MediaType.text.csv))))
