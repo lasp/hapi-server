@@ -30,5 +30,8 @@ lazy val root = (project in file("."))
       "jitpack" at "https://jitpack.io"
     ),
     reStart / mainClass := Some("latis.server.Latis3Server"),
-    scalacOptions -= "-Xfatal-warnings"
+    scalacOptions -= "-Xfatal-warnings",
+    scalacOptions += {
+      if (insideCI.value) "-Wconf:any:e" else "-Wconf:any:w"
+    }
   )
