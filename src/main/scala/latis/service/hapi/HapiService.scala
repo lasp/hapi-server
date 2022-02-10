@@ -71,11 +71,11 @@ class HapiService(catalog: Catalog) extends ServiceInterface(catalog) {
     val interpreter = new Latis3Interpreter(filteredCatalog)
 
     val service = {
-      new LandingPageService[IO].service          <+>
-      new AboutService[IO].service                <+>
-      new CapabilitiesService[IO].service         <+>
-      new InfoService[IO](interpreter).service    <+>
-      new CatalogService[IO](interpreter).service <+>
+      new LandingPageService[IO](interpreter).service <+>
+      new AboutService[IO].service                    <+>
+      new CapabilitiesService[IO].service             <+>
+      new InfoService[IO](interpreter).service        <+>
+      new CatalogService[IO](interpreter).service     <+>
       new DataService[IO](interpreter).service
     }
 
