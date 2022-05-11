@@ -7,7 +7,7 @@ import munit.CatsEffectSuite
 import org.http4s._
 import org.http4s.implicits._
 
-class CapabilitiesServiceSpec extends CatsEffectSuite {
+class CapabilitiesServiceSuite extends CatsEffectSuite {
 
   test("produce correct capabilities endpoint") {
     val req = Request[IO](Method.GET, uri"/capabilities")

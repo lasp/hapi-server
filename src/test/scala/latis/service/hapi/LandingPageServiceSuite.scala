@@ -12,7 +12,7 @@ import latis.catalog.Catalog
 import latis.dataset.MemoizedDataset
 import latis.metadata.Metadata
 
-class LandingPageServiceSpec extends CatsEffectSuite {
+class LandingPageServiceSuite extends CatsEffectSuite {
   private lazy val dataset1 = new MemoizedDataset(Metadata("id"->"id1", "title"->"title1"), null, null)
   private lazy val dataset2 = new MemoizedDataset(Metadata("id"->"id2", "title"->"title2"), null, null)
   private lazy val latisInterp = new Latis3Interpreter(Catalog(dataset1, dataset2))

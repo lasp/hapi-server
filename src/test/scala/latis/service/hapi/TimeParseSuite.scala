@@ -6,7 +6,7 @@ import munit.CatsEffectSuite
 import org.scalactic.Equality
 import org.scalatest.Assertions.convertToEqualizer
 
-class TimeSpec extends CatsEffectSuite {
+class TimeParseSuite extends CatsEffectSuite {
 
   val expected: LocalDateTime = LocalDateTime.of(2018, 1, 1, 0, 0, 0)
 

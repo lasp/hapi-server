@@ -10,7 +10,7 @@ import latis.model._
 import latis.ops.ToHapiTime
 import latis.time.Time
 
-class ToHapiTimeSpec extends CatsEffectSuite {
+class ToHapiTimeSuite extends CatsEffectSuite {
 
   private lazy val toHapiTime = new ToHapiTime
 

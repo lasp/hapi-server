@@ -4,7 +4,7 @@ import io.circe._
 import io.circe.syntax._
 import munit.CatsEffectSuite
 
-class BinSpec extends CatsEffectSuite {
+class BinSuite extends CatsEffectSuite {
 
   test("keep 'centers' if 'ranges' is not defined") {
     val bin = Bin("", None, None, "", Option(""))

@@ -28,7 +28,7 @@ import latis.service.hapi.{Status => HStatus}
 import latis.time.Time
 import latis.util.Identifier.IdentifierStringContext
 
-class DataServiceSpec extends CatsEffectSuite {
+class DataServiceSuite extends CatsEffectSuite {
 
   /** Build a simple test DataService[IO] with a time -> int dataset using the Latis3Interpreter*/
   private lazy val dataset = (for {
