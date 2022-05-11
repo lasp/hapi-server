@@ -2,15 +2,16 @@ package latis.service.hapi
 
 import cats.data.NonEmptyList
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global
 import cats.syntax.all._
 import io.circe.Json
 import io.circe.syntax._
-import org.http4s.{Status => _, _}
+import munit.CatsEffectSuite
+import org.http4s._
+import org.http4s.headers.`Content-Type`
 import org.http4s.implicits._
+import org.http4s.{Status => _}
 import org.scalatest.Assertion
-import org.scalatest.flatspec._
-import org.typelevel.ci.CIString
+import org.scalatest.Assertions.succeed
 import scodec.codecs
 
 import latis.catalog.Catalog
@@ -27,7 +28,7 @@ import latis.service.hapi.{Status => HStatus}
 import latis.time.Time
 import latis.util.Identifier.IdentifierStringContext
 
-class DataServiceSpec extends AnyFlatSpec {
+class DataServiceSpec extends CatsEffectSuite {
 
   /** Build a simple test DataService[IO] with a time -> int dataset using the Latis3Interpreter*/
   private lazy val dataset = (for {
@@ -47,15 +48,15 @@ class DataServiceSpec extends AnyFlatSpec {
   private lazy val dataService = new DataService[IO](latisInterp).service
 
   /** Assert GET request to given URI returns a particular status. */
-  def assertStatus(uri: Uri, status: HStatus): Assertion = {
+  def assertStatus(uri: Uri, status: HStatus): IO[Unit] = {
     val service = new DataService[IO](noopInterpreter).service
     val req = Request[IO](Method.GET, uri)
 
-    val body = service.orNotFound(req).flatMap { res =>
+    service.orNotFound(req).flatMap { res =>
       res.bodyText.compile.toList.map(_.head)
-    }.unsafeRunSync()
-
-    assert(body == HapiError(status).asJson.noSpaces)
+    }.map { body =>
+      assertEquals(body, HapiError(status).asJson.noSpaces)
+    }
   }
 
   /** Assert the CSV decoder rejects the argument. */
@@ -63,7 +64,7 @@ class DataServiceSpec extends AnyFlatSpec {
     QueryDecoders.csvDecoder[String].decode(QueryParameterValue(arg))
       .fold(_ => succeed, _ => fail(s"Accepted bad input: '$arg'"))
 
-  "The data service" should "return a 1402 for invalid start times" in {
+  test("return a 1402 for invalid start times for the data service") {
     assertStatus(
       uri"/data?dataset=0&start=invalid&stop=2018Z",
       HStatus.`1402`
@@ -78,35 +79,35 @@ class DataServiceSpec extends AnyFlatSpec {
     )
   }
 
-  it should "return a 1403 for invalid stop times" in {
+  test("return a 1403 for invalid stop times") {
     assertStatus(
       uri"/data?dataset=0&start=2018Z&stop=invalid",
       HStatus.`1403`
     )
   }
 
-  it should "return a 1404 for misordered times" in {
+  test("return a 1404 for misordered times") {
     assertStatus(
       uri"/data?dataset=0&start=2018Z&stop=2017Z",
       HStatus.`1404`
     )
   }
 
-  it should "return a 1409 for invalid formats" in {
+  test("return a 1409 for invalid formats") {
     assertStatus(
       uri"/data?dataset=0&start=2017Z&stop=2018Z&format=cats",
       HStatus.`1409`
     )
   }
 
-  it should "return a 1410 for invalid include settings" in {
+  test("return a 1410 for invalid include settings") {
     assertStatus(
       uri"/data?dataset=0&start=2017Z&stop=2018Z&include=cats",
       HStatus.`1410`
     )
   }
 
-  it should "be backwards compatible with old param names" in {
+  test("be backwards compatible with old param names") {
     assertStatus(
       uri"/data?id=0&time.min=invalid&time.max=2018Z",
       HStatus.`1402`
@@ -137,155 +138,161 @@ class DataServiceSpec extends AnyFlatSpec {
     )
   }
 
-  "The 'include' parameter" should "accept 'header'" in {
+  test("accept 'header' for the 'include' parameter") {
     val decoded = Include.includeDecoder.decode(QueryParameterValue("header"))
-    decoded.fold(_ => fail(), x => assert(x.header))
+    decoded.fold(_ => fail("Failed to accept good input"), x => assert(x.header))
   }
 
-  it should "reject other arguments" in {
+  test("reject other arguments") {
     val decoded = Include.includeDecoder.decode(QueryParameterValue("yolo"))
-    decoded.fold(_ => succeed, _ => fail("Accepted bad input."))
+    decoded.fold(_ => succeed, _ => fail("Accepted bad input"))
   }
 
-  "The 'format' parameter" should "accept 'csv'" in {
+  test("accept 'csv' for the 'format' parameter") {
     val fmt = "csv"
     val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
-    decoded.fold(_ => fail(), x => assert(x == Format.Csv))
+    decoded.fold(_ => fail("Failed to accept good input"), x => assert(x == Format.Csv))
   }
 
-  it should "accept 'binary'" in {
+  test("accept 'binary'") {
     val fmt = "binary"
     val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
-    decoded.fold(_ => fail(), x => assert(x == Format.Binary))
+    decoded.fold(_ => fail("Failed to accept good input"), x => assert(x == Format.Binary))
   }
 
-  it should "accept 'json'" in {
+  test("accept 'json'") {
     val fmt = "json"
     val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
-    decoded.fold(_ => fail(), x => assert(x == Format.Json))
+    decoded.fold(_ => fail("Failed to accept good input"), x => assert(x == Format.Json))
   }
 
-  it should "reject other arguments" in {
+  test("reject other arguments") {
     val decoded = Format.formatDecoder.decode(QueryParameterValue("yolo"))
     decoded.fold(_ => succeed, _ => fail("Accepted bad input."))
   }
 
-  "The 'parameters' parameter" should "accept a list of parameter names" in {
+  test("accept a list of parameter names for the 'parameters' parameter") {
     val params = NonEmptyList.of("a", "b", "c")
     val decoded = QueryDecoders.csvDecoder[String].decode(
       QueryParameterValue(params.mkString_("", ",", ""))
     )
-    decoded.fold(_ => fail(), x => assert(x == params))
+    decoded.fold(_ => fail("Failed to accept good input"), x => assert(x == params))
   }
 
-  it should "reject an empty parameter list" in {
+  test("reject an empty parameter list") {
     csvDecoderReject("")
   }
 
-  it should "reject commas with no values" in {
+  test("reject commas with no values") {
     csvDecoderReject(",,,")
   }
 
-  it should "reject empty fields" in {
+  test("reject empty fields") {
     csvDecoderReject("a,,c")
   }
 
-  it should "reject leading commas" in {
+  test("reject leading commas") {
     csvDecoderReject(",b,c")
   }
 
-  it should "reject trailing commas" in {
+  test("reject trailing commas") {
     csvDecoderReject("a,b,")
   }
 
-  "The DataService" should "correctly generate a response for a CSV request" in {
+  test("correctly generate a response for a CSV request for the data service endpoint") {
     val req = Request[IO](Method.GET, uri"/data?dataset=testdataset&start=2000-01-01&stop=2000-01-06&format=csv")
     val resp = dataService.orNotFound(req)
-    (for {
-      body <- resp.flatMap { res =>
-        res.bodyText.compile.toList
+
+    val testStr = "2000-01-01T00:00:00.000Z,1\r\n" +
+      "2000-01-02T00:00:00.000Z,5\r\n" +
+      "2000-01-03T00:00:00.000Z,4\r\n" +
+      "2000-01-04T00:00:00.000Z,2\r\n" +
+      "2000-01-05T00:00:00.000Z,0\r\n"
+
+    resp.map { res =>
+      res.headers.get[`Content-Type`].map(_.mediaType) match {
+        case Some(mType) => assertEquals(mType.mainType + "/" + mType.subType, "text/csv")
+        case None => fail("No content type header")
       }
-      contentType = resp.unsafeRunSync().headers.get(CIString("Content-Type")).get.head.value
-    } yield {
-      val testStr = "2000-01-01T00:00:00.000Z,1\r\n" +
-                    "2000-01-02T00:00:00.000Z,5\r\n" +
-                    "2000-01-03T00:00:00.000Z,4\r\n" +
-                    "2000-01-04T00:00:00.000Z,2\r\n" +
-                    "2000-01-05T00:00:00.000Z,0\r\n"
-      assert(body.mkString == testStr)
-      assert(contentType == "text/csv")
-    }).unsafeRunSync()
+      res.bodyText.compile.toList.map { body =>
+        assertEquals(body.mkString, testStr)
+      }
+    }.flatten
   }
 
-  it should "correctly generate a response for a binary request" in {
+  test("correctly generate a response for a binary request") {
     val req = Request[IO](Method.GET, uri"/data?dataset=testdataset&start=2000-01-01&stop=2000-01-06&format=binary")
     val resp = dataService.orNotFound(req)
-    (for {
-      body <- resp.flatMap { res =>
-        res.body.compile.toList
+
+    val encoder = codecs.list(codecs.utf8 ~ codecs.int32L)
+    val testBin = encoder.encode(
+      List(
+        ("2000-01-01T00:00:00.000Z", 1),
+        ("2000-01-02T00:00:00.000Z", 5),
+        ("2000-01-03T00:00:00.000Z", 4),
+        ("2000-01-04T00:00:00.000Z", 2),
+        ("2000-01-05T00:00:00.000Z", 0)
+      )
+    ).require.toByteArray.toList
+
+    resp.map { res =>
+      res.headers.get[`Content-Type`].map(_.mediaType)  match {
+        case Some(mType) => assertEquals(mType.mainType + "/" + mType.subType, "application/octet-stream")
+        case None => fail("No content type header")
       }
-      contentType = resp.unsafeRunSync().headers.get(CIString("Content-Type")).get.head.value
-    } yield {
-      val encoder = codecs.list(codecs.utf8 ~ codecs.int32L)
-      val testBin = encoder.encode(
-        List(
-          ("2000-01-01T00:00:00.000Z", 1),
-          ("2000-01-02T00:00:00.000Z", 5),
-          ("2000-01-03T00:00:00.000Z", 4),
-          ("2000-01-04T00:00:00.000Z", 2),
-          ("2000-01-05T00:00:00.000Z", 0)
-        )
-      ).require.toByteArray.toList
-      assert(body == testBin)
-      assert(contentType == "application/octet-stream")
-    }).unsafeRunSync()
+      res.body.compile.toList.map { body =>
+        assertEquals(body, testBin)
+      }
+    }.flatten
   }
 
-  it should "correctly generate a response for a json request" in {
+  test("correctly generate a response for a json request") {
     val req = Request[IO](Method.GET, uri"/data?dataset=testdataset&start=2000-01-01&stop=2000-01-06&format=json")
     val resp = dataService.orNotFound(req)
-    (for {
-      body <- resp.flatMap { res =>
-        res.body.through(fs2.text.utf8.decode).compile.toList
+
+    val testJson = Json.obj(
+      ("HAPI", Json.fromString("3.0")),
+      ("status", Json.obj(
+        ("code", Json.fromInt(1200)),
+        ("message", Json.fromString("OK"))
+      )),
+      ("parameters", Json.arr(
+        Json.obj(
+          ("name", Json.fromString("time")),
+          ("type", Json.fromString("isotime")),
+          ("length", Json.fromInt(24)),
+          ("units", Json.fromString("UTC")),
+          ("fill", Json.Null),
+        ),
+        Json.obj(
+          ("name", Json.fromString("displacement")),
+          ("type", Json.fromString("integer")),
+          ("units", Json.fromString("meters")),
+          ("fill", Json.Null),
+        ),
+      )),
+      ("startDate", Json.fromString("2000-01-01T00:00:00.000Z")),
+      ("stopDate", Json.fromString("2000-01-05T00:00:00.000Z")),
+      ("format", Json.fromString("json")),
+      ("data", Json.arr(
+        Json.arr(Json.fromString("2000-01-01T00:00:00.000Z"), Json.fromInt(1)),
+        Json.arr(Json.fromString("2000-01-02T00:00:00.000Z"), Json.fromInt(5)),
+        Json.arr(Json.fromString("2000-01-03T00:00:00.000Z"), Json.fromInt(4)),
+        Json.arr(Json.fromString("2000-01-04T00:00:00.000Z"), Json.fromInt(2)),
+        Json.arr(Json.fromString("2000-01-05T00:00:00.000Z"), Json.fromInt(0))
+      ))
+    )
+
+    resp.map { res =>
+      res.headers.get[`Content-Type`].map(_.mediaType)  match {
+        case Some(mType) => assertEquals(mType.mainType + "/" + mType.subType, "application/json")
+        case None => fail("no content type header")
       }
-      jsonBody = io.circe.parser.parse(body.mkString).toOption.get
-      contentType = resp.unsafeRunSync().headers.get(CIString("Content-Type")).get.head.value
-    } yield {
-      val testJson = Json.obj(
-        ("HAPI", Json.fromString("3.0")),
-        ("status", Json.obj(
-          ("code", Json.fromInt(1200)),
-          ("message", Json.fromString("OK"))
-        )),
-        ("parameters", Json.arr(
-          Json.obj(
-            ("name", Json.fromString("time")),
-            ("type", Json.fromString("isotime")),
-            ("length", Json.fromInt(24)),
-            ("units", Json.fromString("UTC")),
-            ("fill", Json.Null),
-          ),
-          Json.obj(
-            ("name", Json.fromString("displacement")),
-            ("type", Json.fromString("integer")),
-            ("units", Json.fromString("meters")),
-            ("fill", Json.Null),
-          ),
-        )),
-        ("startDate", Json.fromString("2000-01-01T00:00:00.000Z")),
-        ("stopDate", Json.fromString("2000-01-05T00:00:00.000Z")),
-        ("format", Json.fromString("json")),
-        ("data", Json.arr(
-          Json.arr(Json.fromString("2000-01-01T00:00:00.000Z"), Json.fromInt(1)),
-          Json.arr(Json.fromString("2000-01-02T00:00:00.000Z"), Json.fromInt(5)),
-          Json.arr(Json.fromString("2000-01-03T00:00:00.000Z"), Json.fromInt(4)),
-          Json.arr(Json.fromString("2000-01-04T00:00:00.000Z"), Json.fromInt(2)),
-          Json.arr(Json.fromString("2000-01-05T00:00:00.000Z"), Json.fromInt(0))
-        ))
-      )
-      assert(jsonBody == testJson)
-      assert(jsonBody.spaces2 == testJson.spaces2)
-      assert(contentType == "application/json")
-    }).unsafeRunSync()
+      res.body.through(fs2.text.utf8.decode).compile.toList.map { body =>
+        val jsonBody = io.circe.parser.parse(body.mkString).toOption
+        assertEquals(jsonBody.get, testJson)
+        assertEquals(jsonBody.get.spaces2, testJson.spaces2)
+      }
+    }.flatten
   }
 }

@@ -1,13 +1,13 @@
 package latis.service.hapi
 
-import org.scalatest.flatspec._
+import munit.CatsEffectSuite
 
-class CatalogServiceSpec extends AnyFlatSpec {
+class CatalogServiceSpec extends CatsEffectSuite {
 
-  "A dataset" should "default to using the ID as the title" in {
+  test("default to using the ID as the dataset title") {
     val id = "id"
     val ds = Dataset(id)
 
-    assert(ds.title == id)
+    assertEquals(ds.title, id)
   }
 }

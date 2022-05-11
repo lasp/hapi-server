@@ -2,11 +2,11 @@ package latis.service.hapi
 
 import io.circe._
 import io.circe.syntax._
-import org.scalatest.flatspec._
+import munit.CatsEffectSuite
 
-class BinSpec extends AnyFlatSpec {
+class BinSpec extends CatsEffectSuite {
 
-  "The Bin encoder" should "keep 'centers' if 'ranges' is not defined" in {
+  test("keep 'centers' if 'ranges' is not defined") {
     val bin = Bin("", None, None, "", Option(""))
 
     val expected = Json.obj(
@@ -16,10 +16,10 @@ class BinSpec extends AnyFlatSpec {
       ("description", "".asJson)
     )
 
-    assert(bin.asJson == expected)
+    assertEquals(bin.asJson, expected)
   }
 
-  it should "remove 'centers' if null and 'ranges' is defined" in {
+  test("remove 'centers' if null and 'ranges' is defined") {
     val bin = Bin("", None, Option(List((1,2))), "", Option(""))
 
     val expected = Json.obj(
@@ -29,10 +29,10 @@ class BinSpec extends AnyFlatSpec {
       ("description", "".asJson)
     )
 
-    assert(bin.asJson == expected)
+    assertEquals(bin.asJson, expected)
   }
 
-  it should "remove null values otherwise" in {
+  test("remove null values otherwise"){
     val bin = Bin("", None, None, "", None)
 
     val expected = Json.obj(
@@ -41,6 +41,6 @@ class BinSpec extends AnyFlatSpec {
       ("units", "".asJson),
     )
 
-    assert(bin.asJson == expected)
+    assertEquals(bin.asJson, expected)
   }
 }

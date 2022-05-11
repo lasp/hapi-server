@@ -1,16 +1,15 @@
 package latis.service.hapi
 
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global
 import io.circe._
 import io.circe.syntax._
+import munit.CatsEffectSuite
 import org.http4s._
 import org.http4s.implicits._
-import org.scalatest.flatspec._
 
-class CapabilitiesServiceSpec extends AnyFlatSpec {
+class CapabilitiesServiceSpec extends CatsEffectSuite {
 
-  "The capabilities service" should "advertise CSV and Binary only" in {
+  test("produce correct capabilities endpoint") {
     val req = Request[IO](Method.GET, uri"/capabilities")
 
     val expected = Json.obj(
@@ -25,15 +24,11 @@ class CapabilitiesServiceSpec extends AnyFlatSpec {
       ))
     )
 
-
-    val body = {
-      val capabilities = new CapabilitiesService[IO]()
-      // False error
-      capabilities.service.orNotFound(req).flatMap { res =>
-        // The stream ought to contain only the body.
-        res.bodyText.compile.toList.map(_.head)
-      }.unsafeRunSync()
+    val capabilities = new CapabilitiesService[IO]()
+    capabilities.service.orNotFound(req).flatMap { res =>
+      res.bodyText.compile.toList.map(_.head)
+    }.map { resp =>
+      assertEquals(resp, expected.noSpaces)
     }
-    assert(body == expected.noSpaces)
   }
 }
