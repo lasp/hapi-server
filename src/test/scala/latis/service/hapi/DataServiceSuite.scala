@@ -193,7 +193,7 @@ class DataServiceSuite extends CatsEffectSuite {
 
     resp.flatMap { res =>
       res.headers.get[`Content-Type`].map(_.mediaType) match {
-        case Some(mType) => assertEquals(mType.mainType + "/" + mType.subType, "text/csv")
+        case Some(mType) => assertEquals(mType, MediaType.text.csv)
         case None => fail("No content type header")
       }
       res.bodyText.compile.toList
@@ -219,7 +219,7 @@ class DataServiceSuite extends CatsEffectSuite {
 
     resp.flatMap { res =>
       res.headers.get[`Content-Type`].map(_.mediaType)  match {
-        case Some(mType) => assertEquals(mType.mainType + "/" + mType.subType, "application/octet-stream")
+        case Some(mType) => assertEquals(mType, MediaType.application.`octet-stream`)
         case None => fail("No content type header")
       }
       res.body.compile.toList
@@ -267,7 +267,7 @@ class DataServiceSuite extends CatsEffectSuite {
 
     resp.flatMap { res =>
       res.headers.get[`Content-Type`].map(_.mediaType) match {
-        case Some(mType) => assertEquals(mType.mainType + "/" + mType.subType, "application/json")
+        case Some(mType) => assertEquals(mType, MediaType.application.json)
         case None => fail("no content type header")
       }
       res.body.through(fs2.text.utf8.decode).compile.toList
