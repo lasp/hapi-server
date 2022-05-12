@@ -2,9 +2,9 @@ package latis.service.hapi
 
 import io.circe._
 import io.circe.syntax._
-import munit.CatsEffectSuite
+import munit.FunSuite
 
-class BinSuite extends CatsEffectSuite {
+class BinSuite extends FunSuite {
 
   test("keep 'centers' if 'ranges' is not defined") {
     val bin = Bin("", None, None, "", Option(""))
