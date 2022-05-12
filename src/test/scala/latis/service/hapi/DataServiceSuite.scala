@@ -67,14 +67,6 @@ class DataServiceSuite extends CatsEffectSuite {
       uri"/data?dataset=0&start=invalid&stop=2018Z",
       HStatus.`1402`
     )
-    assertStatus(
-      uri"/data?dataset=0&start=invalid&stop=2018Z",
-      HStatus.`1402`
-    )
-    assertStatus(
-      uri"/data?dataset=0&start=invalid&stop=2018Z",
-      HStatus.`1402`
-    )
   }
 
   test("return a 1403 for invalid stop times") {
@@ -106,14 +98,6 @@ class DataServiceSuite extends CatsEffectSuite {
   }
 
   test("be backwards compatible with old param names") {
-    assertStatus(
-      uri"/data?id=0&time.min=invalid&time.max=2018Z",
-      HStatus.`1402`
-    )
-    assertStatus(
-      uri"/data?id=0&time.min=invalid&time.max=2018Z",
-      HStatus.`1402`
-    )
     assertStatus(
       uri"/data?id=0&time.min=invalid&time.max=2018Z",
       HStatus.`1402`
