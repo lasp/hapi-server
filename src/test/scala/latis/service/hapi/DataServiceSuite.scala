@@ -10,8 +10,6 @@ import org.http4s._
 import org.http4s.headers.`Content-Type`
 import org.http4s.implicits._
 import org.http4s.{Status => _}
-import org.scalatest.Assertion
-import org.scalatest.Assertions.succeed
 import scodec.codecs
 
 import latis.catalog.Catalog
@@ -60,9 +58,9 @@ class DataServiceSuite extends CatsEffectSuite {
   }
 
   /** Assert the CSV decoder rejects the argument. */
-  def csvDecoderReject(arg: String): Assertion =
+  def csvDecoderReject(arg: String): Unit =
     QueryDecoders.csvDecoder[String].decode(QueryParameterValue(arg))
-      .fold(_ => succeed, _ => fail(s"Accepted bad input: '$arg'"))
+      .fold(_ => assert(cond = true), _ => fail(s"Accepted bad input: '$arg'"))
 
   test("return a 1402 for invalid start times for the data service") {
     assertStatus(
@@ -145,7 +143,7 @@ class DataServiceSuite extends CatsEffectSuite {
 
   test("reject other arguments") {
     val decoded = Include.includeDecoder.decode(QueryParameterValue("yolo"))
-    decoded.fold(_ => succeed, _ => fail("Accepted bad input"))
+    decoded.fold(_ => assert(cond = true), _ => fail("Accepted bad input"))
   }
 
   test("accept 'csv' for the 'format' parameter") {
@@ -168,7 +166,7 @@ class DataServiceSuite extends CatsEffectSuite {
 
   test("reject other arguments") {
     val decoded = Format.formatDecoder.decode(QueryParameterValue("yolo"))
-    decoded.fold(_ => succeed, _ => fail("Accepted bad input."))
+    decoded.fold(_ => assert(cond = true), _ => fail("Accepted bad input."))
   }
 
   test("accept a list of parameter names for the 'parameters' parameter") {

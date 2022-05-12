@@ -1,7 +1,6 @@
 package latis.service.hapi
 
 import munit.CatsEffectSuite
-import org.scalatest.EitherValues._
 
 import latis.data._
 import latis.dataset.MemoizedDataset
@@ -13,11 +12,11 @@ import latis.time.Time
 class ToHapiTimeSuite extends CatsEffectSuite {
 
   private lazy val toHapiTime = new ToHapiTime
+  private lazy val disp = Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters")).getOrElse(fail("Scalar not generated"))
 
   test("expand yyyy-MM-dd") {
-    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"string", "units"->"yyyy-MM-dd", "coverage"->"2000-01-01/2000-01-02")).value
-    val disp = Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters")).value
-    val model = Function.from(time, disp).value
+    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"string", "units"->"yyyy-MM-dd", "coverage"->"2000-01-01/2000-01-02")).getOrElse(fail("Time not generated"))
+    val model = Function.from(time, disp).getOrElse(fail("Model not generated"))
     val data = new SeqFunction(Seq(
       Sample(DomainData("2000-01-01"), RangeData(1)),
     ))
@@ -34,9 +33,8 @@ class ToHapiTimeSuite extends CatsEffectSuite {
   }
 
   test("handle full length yyyy-MM-ddTHH:mm:ss.SSSZ") {
-    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"string", "units"->"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "coverage"->"2000-01-01T00:00:00.000Z/2000-01-02T00:00:00.000Z")).value
-    val disp = Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters")).value
-    val model = Function.from(time, disp).value
+    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"string", "units"->"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "coverage"->"2000-01-01T00:00:00.000Z/2000-01-02T00:00:00.000Z")).getOrElse(fail("Time not generated"))
+    val model = Function.from(time, disp).getOrElse(fail("Model not generated"))
     val data = new SeqFunction(Seq(
       Sample(DomainData("2000-01-01T01:01:01.001Z"), RangeData(1)),
     ))
@@ -53,9 +51,8 @@ class ToHapiTimeSuite extends CatsEffectSuite {
   }
 
   test("expand yyyy-DDD") {
-    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"string", "units"->"yyyy-DDD", "coverage"->"2000-001/2000-002")).value
-    val disp = Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters")).value
-    val model = Function.from(time, disp).value
+    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"string", "units"->"yyyy-DDD", "coverage"->"2000-001/2000-002")).getOrElse(fail("Time not generated"))
+    val model = Function.from(time, disp).getOrElse(fail("Model not generated"))
     val data = new SeqFunction(Seq(
       Sample(DomainData("2000-001"), RangeData(1)),
     ))
@@ -72,9 +69,8 @@ class ToHapiTimeSuite extends CatsEffectSuite {
   }
 
   test("handle full length yyyy-DDDTHH:mm:ss.SSSZ") {
-    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"string", "units"->"yyyy-DDD'T'HH:mm:ss.SSS'Z'", "coverage"->"2000-001T00:00:00.000Z/2000-002T00:00:00.000Z")).value
-    val disp = Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters")).value
-    val model = Function.from(time, disp).value
+    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"string", "units"->"yyyy-DDD'T'HH:mm:ss.SSS'Z'", "coverage"->"2000-001T00:00:00.000Z/2000-002T00:00:00.000Z")).getOrElse(fail("Time not generated"))
+    val model = Function.from(time, disp).getOrElse(fail("Model not generated"))
     val data = new SeqFunction(Seq(
       Sample(DomainData("2000-001T01:01:01.001Z"), RangeData(1)),
     ))
@@ -91,9 +87,8 @@ class ToHapiTimeSuite extends CatsEffectSuite {
   }
 
   test("handle time in seconds since 2000") {
-    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"double", "units"->"seconds since 2000-01-01", "coverage"->"0/10000")).value
-    val disp = Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters")).value
-    val model = Function.from(time, disp).value
+    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"double", "units"->"seconds since 2000-01-01", "coverage"->"0/10000")).getOrElse(fail("Time not generated"))
+    val model = Function.from(time, disp).getOrElse(fail("Model not generated"))
     val data = new SeqFunction(Seq(
       Sample(DomainData(3661.001), RangeData(1)),
     ))
@@ -110,9 +105,8 @@ class ToHapiTimeSuite extends CatsEffectSuite {
   }
 
   test("handle time in milliseconds since 2000") {
-    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"double", "units"->"milliseconds since 2000-01-01", "coverage"->"0/10000000")).value
-    val disp = Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters")).value
-    val model = Function.from(time, disp).value
+    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"double", "units"->"milliseconds since 2000-01-01", "coverage"->"0/10000000")).getOrElse(fail("Time not generated"))
+    val model = Function.from(time, disp).getOrElse(fail("Model not generated"))
     val data = new SeqFunction(Seq(
       Sample(DomainData(3661001.0), RangeData(1)),
     ))
@@ -129,9 +123,8 @@ class ToHapiTimeSuite extends CatsEffectSuite {
   }
 
   test("handle time in seconds since 1970") {
-    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"double", "units"->"seconds since 1970-01-01", "coverage"->"0/1000000000")).value
-    val disp = Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters")).value
-    val model = Function.from(time, disp).value
+    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"double", "units"->"seconds since 1970-01-01", "coverage"->"0/1000000000")).getOrElse(fail("Time not generated"))
+    val model = Function.from(time, disp).getOrElse(fail("Model not generated"))
     val data = new SeqFunction(Seq(
       Sample(DomainData(946688461.001), RangeData(1)),
     ))
@@ -148,9 +141,8 @@ class ToHapiTimeSuite extends CatsEffectSuite {
   }
 
   test("handle time in milliseconds since 1970") {
-    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"double", "units"->"milliseconds since 1970-01-01", "coverage"->"0/1000000000000")).value
-    val disp = Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters")).value
-    val model = Function.from(time, disp).value
+    val time = Time.fromMetadata(Metadata("id"->"time", "type"->"double", "units"->"milliseconds since 1970-01-01", "coverage"->"0/1000000000000")).getOrElse(fail("Time not generated"))
+    val model = Function.from(time, disp).getOrElse(fail("Model not generated"))
     val data = new SeqFunction(Seq(
       Sample(DomainData(946688461001.0), RangeData(1)),
     ))

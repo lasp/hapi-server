@@ -3,8 +3,6 @@ package latis.service.hapi
 import java.time.LocalDateTime
 
 import munit.CatsEffectSuite
-import org.scalactic.Equality
-import org.scalatest.Assertions.convertToEqualizer
 
 class TimeParseSuite extends CatsEffectSuite {
 
@@ -12,14 +10,9 @@ class TimeParseSuite extends CatsEffectSuite {
 
   def testParse(str: String): Unit =
     Time.parse(str) match {
-      case Some(t) => assert(t === expected)
+      case Some(t) => assertEquals(t, expected)
       case None => fail(s"Failed to parse time string: $str")
     }
-
-  // The `equals` method should be used to compare `LocalDateTime`
-  // instances. See the Javadocs.
-  implicit val eq: Equality[LocalDateTime] =
-    (a: LocalDateTime, b: Any) => a.equals(b)
 
   test("parse date and time strings with the time string parser") {
     testParse("2018-01-01T00:00:00.000Z")

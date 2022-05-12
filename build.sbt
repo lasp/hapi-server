@@ -17,8 +17,6 @@ lazy val root = (project in file("."))
       "org.http4s"                   %% "http4s-dsl"               % http4sVersion % Provided,
       "org.http4s"                   %% "http4s-circe"             % http4sVersion,
       "org.http4s"                   %% "http4s-scalatags"         % http4sVersion,
-      "org.scalatest"                %% "scalatest"                % "3.2.11" % Test,
-      "org.scalatestplus"            %% "scalacheck-1-15"          % "3.2.11.0" % Test,
       "org.scalameta"                %% "munit"                    % "0.7.29" % Test,
       "org.typelevel"                %% "munit-cats-effect-3"      % "1.0.7" % Test,
       "io.circe"                     %% "circe-generic"            % "0.14.2",
