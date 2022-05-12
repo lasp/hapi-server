@@ -1,8 +1,8 @@
 package latis.service.hapi
 
-import munit.CatsEffectSuite
+import munit.FunSuite
 
-class CatalogServiceSuite extends CatsEffectSuite {
+class CatalogServiceSuite extends FunSuite {
 
   test("default to using the ID as the dataset title") {
     val id = "id"
