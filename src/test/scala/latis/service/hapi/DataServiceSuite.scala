@@ -46,7 +46,7 @@ class DataServiceSuite extends CatsEffectSuite {
   private lazy val dataService = new DataService[IO](latisInterp).service
 
   /** Assert GET request to given URI returns a particular status. */
-  def assertStatus(uri: Uri, status: HStatus): IO[Unit] = {
+  def assertStatus(uri: Uri, status: HStatus)(implicit loc: munit.Location): IO[Unit] = {
     val service = new DataService[IO](noopInterpreter).service
     val req = Request[IO](Method.GET, uri)
 
@@ -58,7 +58,7 @@ class DataServiceSuite extends CatsEffectSuite {
   }
 
   /** Assert the CSV decoder rejects the argument. */
-  def csvDecoderReject(arg: String): Unit =
+  def csvDecoderReject(arg: String)(implicit loc: munit.Location): Unit =
     QueryDecoders.csvDecoder[String].decode(QueryParameterValue(arg))
       .fold(_ => assert(cond = true), _ => fail(s"Accepted bad input: '$arg'"))
 
