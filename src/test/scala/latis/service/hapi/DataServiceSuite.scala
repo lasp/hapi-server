@@ -62,7 +62,7 @@ class DataServiceSuite extends CatsEffectSuite {
     QueryDecoders.csvDecoder[String].decode(QueryParameterValue(arg))
       .fold(_ => assert(cond = true), _ => fail(s"Accepted bad input: '$arg'"))
 
-  test("return a 1402 for invalid start times for the data service") {
+  test("return a 1402 for invalid start times") {
     assertStatus(
       uri"/data?dataset=0&start=invalid&stop=2018Z",
       HStatus.`1402`
@@ -136,19 +136,19 @@ class DataServiceSuite extends CatsEffectSuite {
     decoded.fold(_ => fail("Failed to accept good input"), x => assert(x == Format.Csv))
   }
 
-  test("accept 'binary'") {
+  test("accept 'binary' for the 'format' parameter") {
     val fmt = "binary"
     val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
     decoded.fold(_ => fail("Failed to accept good input"), x => assert(x == Format.Binary))
   }
 
-  test("accept 'json'") {
+  test("accept 'json' for the 'format' parameter") {
     val fmt = "json"
     val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
     decoded.fold(_ => fail("Failed to accept good input"), x => assert(x == Format.Json))
   }
 
-  test("reject other arguments") {
+  test("reject other arguments for the 'include' parameter") {
     val decoded = Format.formatDecoder.decode(QueryParameterValue("yolo"))
     decoded.fold(_ => assert(cond = true), _ => fail("Accepted bad input."))
   }
@@ -161,27 +161,27 @@ class DataServiceSuite extends CatsEffectSuite {
     decoded.fold(_ => fail("Failed to accept good input"), x => assert(x == params))
   }
 
-  test("reject an empty parameter list") {
+  test("reject an empty parameter list for the 'parameters' parameter") {
     csvDecoderReject("")
   }
 
-  test("reject commas with no values") {
+  test("reject commas with no values for the 'parameters' parameter") {
     csvDecoderReject(",,,")
   }
 
-  test("reject empty fields") {
+  test("reject empty fields for the 'parameters' parameter") {
     csvDecoderReject("a,,c")
   }
 
-  test("reject leading commas") {
+  test("reject leading commas for the 'parameters' parameter") {
     csvDecoderReject(",b,c")
   }
 
-  test("reject trailing commas") {
+  test("reject trailing commas for the 'parameters' parameter") {
     csvDecoderReject("a,b,")
   }
 
-  test("correctly generate a response for a CSV request for the data service endpoint") {
+  test("correctly generate a response for a CSV request") {
     val req = Request[IO](Method.GET, uri"/data?dataset=testdataset&start=2000-01-01&stop=2000-01-06&format=csv")
     val resp = dataService.orNotFound(req)
 

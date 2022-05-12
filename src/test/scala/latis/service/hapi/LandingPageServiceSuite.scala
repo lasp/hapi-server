@@ -18,7 +18,7 @@ class LandingPageServiceSuite extends CatsEffectSuite {
   private lazy val latisInterp = new Latis3Interpreter(Catalog(dataset1, dataset2))
   private lazy val landingPageService = new LandingPageService[IO](latisInterp)
 
-  test("create a non-zero length '200 OK' response for the landing page endpoint") {
+  test("create a non-zero length '200 OK' response") {
     val req = Request[IO](Method.GET, uri"/")
     val resp = landingPageService.service.orNotFound(req)
 

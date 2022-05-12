@@ -14,7 +14,7 @@ class TimeParseSuite extends FunSuite {
       case None => fail(s"Failed to parse time string: $str")
     }
 
-  test("parse date and time strings with the time string parser") {
+  test("parse date and time strings") {
     testParse("2018-01-01T00:00:00.000Z")
 
     // Missing the trailing 'Z'
