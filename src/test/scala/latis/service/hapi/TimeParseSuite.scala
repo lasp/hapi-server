@@ -2,9 +2,9 @@ package latis.service.hapi
 
 import java.time.LocalDateTime
 
-import munit.CatsEffectSuite
+import munit.FunSuite
 
-class TimeParseSuite extends CatsEffectSuite {
+class TimeParseSuite extends FunSuite {
 
   val expected: LocalDateTime = LocalDateTime.of(2018, 1, 1, 0, 0, 0)
 
