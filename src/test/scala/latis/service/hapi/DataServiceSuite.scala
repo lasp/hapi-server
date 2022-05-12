@@ -101,19 +101,19 @@ class DataServiceSuite extends CatsEffectSuite {
     assertStatus(
       uri"/data?id=0&time.min=invalid&time.max=2018Z",
       HStatus.`1402`
-    )
+    ) >>
     assertStatus(
       uri"/data?id=0&time.min=2018Z&time.max=invalid",
       HStatus.`1403`
-    )
+    ) >>
     assertStatus(
       uri"/data?id=0&time.min=2018Z&time.max=2017Z",
       HStatus.`1404`
-    )
+    ) >>
     assertStatus(
       uri"/data?id=0&time.min=2017Z&time.max=2018Z&format=cats",
       HStatus.`1409`
-    )
+    ) >>
     assertStatus(
       uri"/data?id=0&time.min=2017Z&time.max=2018Z&include=cats",
       HStatus.`1410`
