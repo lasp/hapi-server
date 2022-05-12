@@ -125,7 +125,7 @@ class DataServiceSuite extends CatsEffectSuite {
     decoded.fold(_ => fail("Failed to accept good input"), x => assert(x.header))
   }
 
-  test("reject other arguments") {
+  test("reject other arguments for the 'include' parameter") {
     val decoded = Include.includeDecoder.decode(QueryParameterValue("yolo"))
     decoded.fold(_ => assert(cond = true), _ => fail("Accepted bad input"))
   }
@@ -148,7 +148,7 @@ class DataServiceSuite extends CatsEffectSuite {
     decoded.fold(_ => fail("Failed to accept good input"), x => assert(x == Format.Json))
   }
 
-  test("reject other arguments for the 'include' parameter") {
+  test("reject other arguments for the 'format' parameter") {
     val decoded = Format.formatDecoder.decode(QueryParameterValue("yolo"))
     decoded.fold(_ => assert(cond = true), _ => fail("Accepted bad input."))
   }
