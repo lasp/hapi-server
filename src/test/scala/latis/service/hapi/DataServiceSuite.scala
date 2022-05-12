@@ -207,15 +207,15 @@ class DataServiceSuite extends CatsEffectSuite {
       "2000-01-04T00:00:00.000Z,2\r\n" +
       "2000-01-05T00:00:00.000Z,0\r\n"
 
-    resp.map { res =>
+    resp.flatMap { res =>
       res.headers.get[`Content-Type`].map(_.mediaType) match {
         case Some(mType) => assertEquals(mType.mainType + "/" + mType.subType, "text/csv")
         case None => fail("No content type header")
       }
-      res.bodyText.compile.toList.map { body =>
-        assertEquals(body.mkString, testStr)
-      }
-    }.flatten
+      res.bodyText.compile.toList
+    }.map { body =>
+      assertEquals(body.mkString, testStr)
+    }
   }
 
   test("correctly generate a response for a binary request") {
@@ -233,15 +233,15 @@ class DataServiceSuite extends CatsEffectSuite {
       )
     ).require.toByteArray.toList
 
-    resp.map { res =>
+    resp.flatMap { res =>
       res.headers.get[`Content-Type`].map(_.mediaType)  match {
         case Some(mType) => assertEquals(mType.mainType + "/" + mType.subType, "application/octet-stream")
         case None => fail("No content type header")
       }
-      res.body.compile.toList.map { body =>
-        assertEquals(body, testBin)
-      }
-    }.flatten
+      res.body.compile.toList
+    }.map { body =>
+      assertEquals(body, testBin)
+    }
   }
 
   test("correctly generate a response for a json request") {
@@ -281,16 +281,16 @@ class DataServiceSuite extends CatsEffectSuite {
       ))
     )
 
-    resp.map { res =>
-      res.headers.get[`Content-Type`].map(_.mediaType)  match {
+    resp.flatMap { res =>
+      res.headers.get[`Content-Type`].map(_.mediaType) match {
         case Some(mType) => assertEquals(mType.mainType + "/" + mType.subType, "application/json")
         case None => fail("no content type header")
       }
-      res.body.through(fs2.text.utf8.decode).compile.toList.map { body =>
-        val jsonBody = io.circe.parser.parse(body.mkString).toOption
-        assertEquals(jsonBody.get, testJson)
-        assertEquals(jsonBody.get.spaces2, testJson.spaces2)
-      }
-    }.flatten
+      res.body.through(fs2.text.utf8.decode).compile.toList
+    }.map { body =>
+      val jsonBody = io.circe.parser.parse(body.mkString).toOption
+      assertEquals(jsonBody.get, testJson)
+      assertEquals(jsonBody.get.spaces2, testJson.spaces2)
+    }
   }
 }
