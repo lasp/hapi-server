@@ -32,7 +32,7 @@ class BinSuite extends FunSuite {
     assertEquals(bin.asJson, expected)
   }
 
-  test("remove null values otherwise"){
+  test("remove null values otherwise") {
     val bin = Bin("", None, None, "", None)
 
     val expected = Json.obj(
