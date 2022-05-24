@@ -25,14 +25,27 @@ import latis.service.hapi.HapiError._
 import latis.service.hapi.HapiInterpreter.noopInterpreter
 import latis.service.hapi.{Status => HStatus}
 import latis.time.Time
-import latis.util.Identifier.IdentifierStringContext
+import latis.util.Identifier._
 
 class DataServiceSuite extends CatsEffectSuite {
 
   /** Build a simple test DataService[IO] with a time -> int dataset using the Latis3Interpreter*/
   private lazy val dataset = (for {
-    time <- Time.fromMetadata(Metadata("id"->"time", "type"->"string", "units"->"yyyy-MM-dd", "coverage"->"2000-01-01/2000-01-05"))
-    disp <- Scalar.fromMetadata(Metadata("id"->"displacement", "type"->"int", "units"->"meters"))
+    time <- Time.fromMetadata(
+      Metadata(
+        "id" -> "time",
+        "type" -> "string",
+        "units" -> "yyyy-MM-dd",
+        "coverage" -> "2000-01-01/2000-01-05"
+      )
+    )
+    disp <- Scalar.fromMetadata(
+      Metadata(
+        "id" -> "displacement",
+        "type" -> "int",
+        "units" -> "meters"
+      )
+    )
     model <- Function.from(id"testfunc", time, disp)
     data = new SeqFunction(Seq(
       Sample(DomainData("2000-01-01"), RangeData(1)),
@@ -41,7 +54,7 @@ class DataServiceSuite extends CatsEffectSuite {
       Sample(DomainData("2000-01-04"), RangeData(2)),
       Sample(DomainData("2000-01-05"), RangeData(0)),
     ))
-    dataset = new MemoizedDataset(Metadata("id"->"testdataset"), model, data)
+    dataset = new MemoizedDataset(Metadata("id" -> "testdataset"), model, data)
   } yield dataset).fold(err => fail(err.message), identity)
   private lazy val latisInterp = new Latis3Interpreter(Catalog(dataset))
   private lazy val dataService = new DataService[IO](latisInterp).service
@@ -52,9 +65,7 @@ class DataServiceSuite extends CatsEffectSuite {
     val req = Request[IO](Method.GET, uri)
 
     service.orNotFound(req).flatMap { res =>
-      res.bodyText.compile.toList.map(_.head)
-    }.map { body =>
-      assertEquals(body, HapiError(status).asJson.noSpaces)
+      res.as[Json].assertEquals(HapiError(status).asJson)
     }
   }
 
@@ -128,30 +139,30 @@ class DataServiceSuite extends CatsEffectSuite {
 
   test("reject other arguments for the 'include' parameter") {
     val decoded = Include.includeDecoder.decode(QueryParameterValue("yolo"))
-    decoded.fold(_ => assert(cond = true), _ => fail("Accepted bad input"))
+    decoded.fold(_ => assert(true), _ => fail("Accepted bad input"))
   }
 
   test("accept 'csv' for the 'format' parameter") {
     val fmt = "csv"
     val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
-    decoded.fold(_ => fail("Failed to accept good input"), x => assert(x == Format.Csv))
+    decoded.fold(_ => fail("Failed to accept good input"), x => assertEquals(x, Format.Csv))
   }
 
   test("accept 'binary' for the 'format' parameter") {
     val fmt = "binary"
     val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
-    decoded.fold(_ => fail("Failed to accept good input"), x => assert(x == Format.Binary))
+    decoded.fold(_ => fail("Failed to accept good input"), x => assertEquals(x, Format.Binary))
   }
 
   test("accept 'json' for the 'format' parameter") {
     val fmt = "json"
     val decoded = Format.formatDecoder.decode(QueryParameterValue(fmt))
-    decoded.fold(_ => fail("Failed to accept good input"), x => assert(x == Format.Json))
+    decoded.fold(_ => fail("Failed to accept good input"), x => assertEquals(x, Format.Json))
   }
 
   test("reject other arguments for the 'format' parameter") {
     val decoded = Format.formatDecoder.decode(QueryParameterValue("yolo"))
-    decoded.fold(_ => assert(cond = true), _ => fail("Accepted bad input."))
+    decoded.fold(_ => assert(true), _ => fail("Accepted bad input."))
   }
 
   test("accept a list of parameter names for the 'parameters' parameter") {
@@ -159,7 +170,7 @@ class DataServiceSuite extends CatsEffectSuite {
     val decoded = QueryDecoders.csvDecoder[String].decode(
       QueryParameterValue(params.mkString_("", ",", ""))
     )
-    decoded.fold(_ => fail("Failed to accept good input"), x => assert(x == params))
+    decoded.fold(_ => fail("Failed to accept good input"), x => assertEquals(x, params))
   }
 
   test("reject an empty parameter list for the 'parameters' parameter") {
@@ -197,9 +208,7 @@ class DataServiceSuite extends CatsEffectSuite {
         case Some(mType) => assertEquals(mType, MediaType.text.csv)
         case None => fail("No content type header")
       }
-      res.bodyText.compile.toList
-    }.map { body =>
-      assertEquals(body.mkString, testStr)
+      res.bodyText.compile.string.assertEquals(testStr)
     }
   }
 
@@ -223,9 +232,7 @@ class DataServiceSuite extends CatsEffectSuite {
         case Some(mType) => assertEquals(mType, MediaType.application.`octet-stream`)
         case None => fail("No content type header")
       }
-      res.body.compile.toList
-    }.map { body =>
-      assertEquals(body, testBin)
+      res.body.compile.toList.assertEquals(testBin)
     }
   }
 
