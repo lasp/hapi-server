@@ -5,6 +5,7 @@ import io.circe._
 import io.circe.syntax._
 import munit.CatsEffectSuite
 import org.http4s._
+import org.http4s.circe._
 import org.http4s.implicits._
 
 class CapabilitiesServiceSuite extends CatsEffectSuite {
@@ -26,9 +27,7 @@ class CapabilitiesServiceSuite extends CatsEffectSuite {
 
     val capabilities = new CapabilitiesService[IO]()
     capabilities.service.orNotFound(req).flatMap { res =>
-      res.bodyText.compile.toList.map(_.head)
-    }.map { resp =>
-      assertEquals(resp, expected.noSpaces)
+      res.as[Json].assertEquals(expected)
     }
   }
 }
