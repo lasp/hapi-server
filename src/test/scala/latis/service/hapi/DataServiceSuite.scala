@@ -7,6 +7,7 @@ import io.circe.Json
 import io.circe.syntax._
 import munit.CatsEffectSuite
 import org.http4s._
+import org.http4s.circe._
 import org.http4s.headers.`Content-Type`
 import org.http4s.implicits._
 import org.http4s.{Status => _}
@@ -270,11 +271,8 @@ class DataServiceSuite extends CatsEffectSuite {
         case Some(mType) => assertEquals(mType, MediaType.application.json)
         case None => fail("no content type header")
       }
-      res.body.through(fs2.text.utf8.decode).compile.toList
-    }.map { body =>
-      val jsonBody = io.circe.parser.parse(body.mkString).toOption
-      assertEquals(jsonBody.get, testJson)
-      assertEquals(jsonBody.get.spaces2, testJson.spaces2)
+
+      res.as[Json].map(assertEquals(_, testJson))
     }
   }
 }
