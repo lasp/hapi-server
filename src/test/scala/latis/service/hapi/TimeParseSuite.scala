@@ -6,7 +6,7 @@ import munit.FunSuite
 
 class TimeParseSuite extends FunSuite {
 
-  val expected: LocalDateTime = LocalDateTime.of(2018, 1, 1, 0, 0, 0)
+  val expected = LocalDateTime.of(2018, 1, 1, 0, 0, 0)
 
   def testParse(str: String)(implicit loc: munit.Location): Unit =
     Time.parse(str) match {
