@@ -2,7 +2,7 @@ ThisBuild / organization := "io.latis-data"
 ThisBuild / scalaVersion := "2.13.8"
 
 val fs2DataVersion = "1.3.1"
-val http4sVersion = "0.23.11"
+val http4sVersion = "0.23.12"
 val latisVersion = "a626466"
 
 lazy val root = (project in file("."))
@@ -16,7 +16,7 @@ lazy val root = (project in file("."))
       "com.github.latis-data"         % "latis3-hapi"              % "1d52ef7",
       "org.http4s"                   %% "http4s-dsl"               % http4sVersion % Provided,
       "org.http4s"                   %% "http4s-circe"             % http4sVersion,
-      "org.http4s"                   %% "http4s-scalatags"         % http4sVersion,
+      "org.http4s"                   %% "http4s-scalatags"         % "0.23.11",
       "org.scalameta"                %% "munit"                    % "0.7.29" % Test,
       "org.typelevel"                %% "munit-cats-effect-3"      % "1.0.7" % Test,
       "io.circe"                     %% "circe-generic"            % "0.14.2",
