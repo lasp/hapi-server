@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <dataset id="simple_dataset"
+    temporalCoverage="2018-01-01/2018-01-03"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="http://latis-data.io/schemas/1.0/fdml-with-text-adapter.xsd">
 
@@ -14,8 +15,7 @@
         <scalar id="time"
                 type="string"
                 class="latis.time.Time"
-                units="yyyy-MM-dd'T'hh:mm:ss'Z'"
-                coverage="2018-01-01T00:00:00Z/2018-01-01T00:00:02Z"/>
+                units="yyyy-MM-dd"/>
         <scalar id="value" type="int" units="units"/>
     </function>
 </dataset>

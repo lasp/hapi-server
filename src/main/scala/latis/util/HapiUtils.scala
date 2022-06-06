@@ -1,34 +1,43 @@
 package latis.util
 
-import cats.implicits._
+import cats.syntax.all._
 
 import latis.service.hapi._
 import latis.time.TimeFormat
-import latis.time.TimeScale
-import latis.units.UnitConverter
 
 object HapiUtils {
 
-  /** Convert a time value to a HAPI time given its original units. */
-  def toHapiTime(fmt: String, value: String): Either[InfoError, String] = for {
-    fromTime <- TimeFormat.fromExpression(fmt)
-      .flatMap(_.parse(value).map(_.toDouble))
-      .orElse(Either.catchNonFatal(value.toDouble))
-      .leftMap(_ => MetadataError("Unsupported time units"))
-    scale    <- TimeScale.fromExpression(fmt)
-      .leftMap(_ => MetadataError("Unsupported time units"))
-    converter = UnitConverter(scale, TimeScale.Default)
-    toTime    = converter.convert(fromTime).toLong
-  } yield TimeFormat.formatIso(toTime)
-
-  /** Parse coverage metadata from FDML and convert to HAPI time. */
-  def parseCoverage(coverage: String, fmt: String): Either[InfoError, (String, String)] = {
+  /**
+   * Parse temporalCoverage from Dataset metadata to be used for HAPI info.
+   *
+   * The coverage is expected to be "/" separated ISO 8601 times. These will
+   * be converted to the form yyyy-MM-ddZ for the HAPI info response. A coverage
+   * without a value after the "/" will use the current date as the end time.
+   */
+  def parseCoverage(coverage: String): Either[InfoError, (String, String)] = {
     coverage.split('/').toList match {
-      case s :: e :: Nil if s.nonEmpty && e.nonEmpty => for {
-        sF <- toHapiTime(fmt, s)
-        eF <- toHapiTime(fmt, e)
-      } yield (sF, eF)
-      case _ => MetadataError("Invalid coverage").asLeft
+      case s :: e :: Nil if s.nonEmpty && e.nonEmpty =>
+        (for {
+          targetFomat <- TimeFormat.fromExpression("yyyy-MM-dd'Z'")
+          startMillis <- TimeFormat.parseIso(s)
+          endMillis   <- TimeFormat.parseIso(e)
+          startDate    = targetFomat.format(startMillis)
+          endDate      = targetFomat.format(endMillis)
+        } yield (startDate, endDate)).leftMap { _ =>
+          MetadataError(s"Invalid temporalCoverage: $coverage")
+        }
+      // Replace open end (e.g. "2000-01-01/") with current date
+      case s :: Nil if s.nonEmpty && coverage.endsWith("/") =>
+        (for {
+          targetFomat <- TimeFormat.fromExpression("yyyy-MM-dd'Z'")
+          startMillis <- TimeFormat.parseIso(s)
+          endMillis    = System.currentTimeMillis() //TODO: beware side effect
+          startDate    = targetFomat.format(startMillis)
+          endDate      = targetFomat.format(endMillis)
+        } yield (startDate, endDate)).leftMap { _ =>
+          MetadataError(s"Invalid temporalCoverage: $coverage")
+        }
+      case _ => MetadataError(s"Invalid temporalCoverage: $coverage").asLeft
     }
   }
 }
