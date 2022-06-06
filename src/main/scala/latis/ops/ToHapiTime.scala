@@ -2,18 +2,10 @@ package latis.ops
 
 import cats.implicits._
 
-import latis.data.Number
 import latis.data.Sample
-import latis.data.Text
-import latis.metadata.Metadata
 import latis.model._
-import latis.service.hapi.InfoError
-import latis.service.hapi.MetadataError
 import latis.time.Time
 import latis.time.TimeFormat
-import latis.time.TimeScale
-import latis.units.UnitConverter
-import latis.util.HapiUtils
 import latis.util.LatisException
 
 /**
@@ -25,62 +17,24 @@ import latis.util.LatisException
  */
 class ToHapiTime extends MapOperation {
 
-  // Convert the units and coverage in the time metadata.
-  override def applyToModel(model: DataType): Either[LatisException, DataType] = model match {
-    case Function(t: Time, r) =>
-      val tHapi: Either[InfoError, Time] = for {
-        fmt  <- getMetadata(t, "units")
-        cov  <- getMetadata(t, "coverage")
-        covP <- HapiUtils.parseCoverage(cov, fmt)
-      } yield {
-        val md = t.metadata ++ Metadata(
-          "size" -> "24",
-          "units" -> TimeFormat.Iso.toString,
-          "coverage" -> s"${covP._1}/${covP._2}"
-        )
-        Time.fromMetadata(md).fold(throw _, identity)
-      }
+  /** Defines a FormatTime operation to delegate to. */
+  private lazy val formatTime = TimeFormat.fromExpression("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").map { tf =>
+    FormatTime(tf)
+  }.fold(throw _, identity) //should be safe
 
-      tHapi.fold(
-        _ => Left(LatisException("Failed to apply to model")),
-        time => Function.from(time, r)
-      )
-    case _ => Left(LatisException("Failed to apply to model"))
-  }
-
-  // Convert the first Data in the domain (assumed to be time, because
-  // this is for HAPI).
-  override def mapFunction(model: DataType): Sample => Sample = {
-    val time: Time = model match {
-      case Function(t: Time, _) => t
-      case _ => throw new RuntimeException("Failed to create map function: domain is not time")
-    }
-    val converter = UnitConverter(time.timeScale, TimeScale.Default)
-
-    if (!time.timeFormat.contains(TimeFormat.Iso)) {
-      case Sample(Number(t) :: rest, r) =>
-        val tC = converter.convert(t).toLong
-        val tF = TimeFormat.formatIso(tC)
-
-        Sample(tF :: rest, r)
-      case Sample(Text(t) :: rest, r)   =>
-        val fmt = time.timeFormat.getOrElse {
-          throw new LatisException("Failed to create map function: TimeFormat not found")
-        }
-        val tD = fmt.parse(t).fold(throw _, _.toDouble)
-        val tC = converter.convert(tD).toLong
-        val tF = TimeFormat.formatIso(tC)
-
-        Sample(tF :: rest, r)
-      case _ => throw new LatisException("Failed to create map function: invalid Sample")
-    } else {
-      s: Sample => s
+  // Delegate to the FormatTime operation. Set time variable size to support binary encoding.
+  override def applyToModel(model: DataType): Either[LatisException, DataType] = {
+    formatTime.applyToModel(model) match {
+      case Right(Function(t: Time, range)) =>
+        for {
+          t <- Time.fromMetadata(t.metadata + ("size", "24"))
+          f <- Function.from(t, range)
+        } yield f
+      case _ => LatisException(s"Unsupported model: $model").asLeft
     }
   }
 
-  private def getMetadata(s: Scalar, key: String): Either[MetadataError, String] =
-    Either.fromOption(
-      s.metadata.getProperty(key),
-      MetadataError(s"Missing metadata property $key")
-    )
+  // Delegate to the FormatTime operation.
+  override def mapFunction(model: DataType): Sample => Sample = formatTime.mapFunction(model)
+
 }
