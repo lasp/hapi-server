@@ -22,9 +22,9 @@ as a function of time, stored in a [CSV file][csv].
 
 ```
 #time,value
-2018-01-01T00:00:00Z,0
-2018-01-01T00:00:01Z,1
-2018-01-01T00:00:02Z,2
+2018-01-01,0
+2018-01-02,1
+2018-01-03,2
 ```
 
 We will need to provide an FDML file that describes this dataset.
@@ -170,8 +170,8 @@ implemented by the `latis.time.Time` class.
 Finally, we need to add metadata for our dataset. HAPI requires that
 we define the following:
 
+- time coverage
 - units for all variables
-- coverage for time variables
 
 This is how we specify the required metadata in FDML:
 
@@ -179,6 +179,7 @@ This is how we specify the required metadata in FDML:
 <?xml version="1.0" encoding="UTF-8"?>
 
 <dataset id="simple_dataset"
+    temporalCoverage="2018-01-01/2018-01-03"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="http://latis-data.io/schemas/1.0/fdml-with-text-adapter.xsd">
 
@@ -192,21 +193,22 @@ This is how we specify the required metadata in FDML:
         <scalar id="time"
                 type="string"
                 class="latis.time.Time"
-                units="yyyy-MM-dd'T'hh:mm:ss'Z'"
-                coverage="2018-01-01T00:00:00Z/2018-01-01T00:00:02Z"/>
+                units="yyyy-MM-dd"/>
         <scalar id="value" type="int" units="units"/>
     </function>
 </dataset>
 ```
 
-We can add metadata to the model by adding attributes:
+We can add metadata to the dataset by adding attributes:
 
+- `temporalCoverage` : Adds time coverage (specified as `<start>/<stop>`)
+  - The `start` and `stop` times must be in ISO 8601 format. If the `stop`
+    time is not present, the current date will be used.
 - `units` : Adds units
   - For times represented by formatted text, this is a [time format
-    string][java-sdf]. This is so LaTiS can read and convert times.
+    string][java-dtf]. This is so LaTiS can read and convert times.
     The server will report "UTC" as the units as required by the HAPI
     specification.
-- `coverage` : Adds coverage (specified as `<start>/<stop>`)
 
 The snippet above is a complete FDML file that describes the simple
 CSV data. Both the FDML and the CSV files are available in the
@@ -233,7 +235,7 @@ If the FDML file is invalid, you'll get a message with the error.
 [fdm]: https://github.com/latis-data/latis/wiki/LaTiS-Data-Model
 [fdml]: ../examples/fdml/simple_dataset.fdml
 [hapi-spec]: https://github.com/hapi-server/data-specification/blob/master/hapi-2.1.0/HAPI-data-access-spec-2.1.0.md
-[java-sdf]: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/text/SimpleDateFormat.html
+[java-dtf]: https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/format/DateTimeFormatter.html
 [latis-3]: https://github.com/latis-data/latis3
 [readme]: ../README.md
 [releases]: https://github.com/lasp/hapi-server/releases

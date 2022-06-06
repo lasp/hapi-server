@@ -126,15 +126,11 @@ class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
       NonEmptyList.fromList(params),
       UnsupportedDataset("")
     )
-    tFmt   <- Either.fromOption(
-      tVar.metadata.getProperty("units"),
-      MetadataError("Time parameter missing metadata property 'units'")
-    )
     tCov   <- Either.fromOption(
-      tVar.metadata.getProperty("coverage"),
-      MetadataError("Time parameter missing metadata property 'coverage'")
+      ds.metadata.getProperty("temporalCoverage"),
+      MetadataError("Dataset missing metadata property 'temporalCoverage'")
     )
-    tCovP  <- parseCoverage(tCov, tFmt)
+    tCovP  <- parseCoverage(tCov)
   } yield Metadata(
     psNel,
     tCovP._1,
