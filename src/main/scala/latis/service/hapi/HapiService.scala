@@ -41,7 +41,7 @@ class HapiService(catalog: Catalog) extends ServiceInterface(catalog) {
   // This checks that:
   // - The Dataset metadata has temporalCoverage
   // - The single domain variable is of type Time
-  // - Each scalar in the range has units and a supported type
+  // - Each scalar in the range has a supported type
   // - If the type of a scalar is string, its size is defined
   private val filteredCatalog: Catalog = {
     val covP:  Metadata => Boolean = _.getProperty("temporalCoverage").isDefined
@@ -53,17 +53,16 @@ class HapiService(catalog: Catalog) extends ServiceInterface(catalog) {
       case "short"  => true //may be converted to int by ConvertHapiTypes
       case _        => false
     }
-    val unitsP: Metadata => Boolean = _.getProperty("units").isDefined
 
     catalog.filter { ds =>
       covP(ds.metadata) &&
       (ds.model match {
         case Function(_: Time, range) =>
-          // Note: Time is guaranteed to have units and the value type
-          // does not matter since it will be converted via ToHapiTime.
+          // Note: The Time value type does not matter
+          // since it will be converted via ToHapiTime.
           range.getScalars.forall { s =>
             val md = s.metadata
-            typeP(md) && unitsP(md)
+            typeP(md)
           }
         case _ => false
       })
