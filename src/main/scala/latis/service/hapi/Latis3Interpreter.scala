@@ -16,6 +16,7 @@ import io.circe.JsonObject
 import latis.catalog.Catalog
 import latis.model.Function
 import latis.model.Scalar
+import latis.ops.ConvertHapiTypes
 import latis.ops.Projection
 import latis.ops.Selection
 import latis.ops.ToHapiTime
@@ -93,7 +94,9 @@ class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
 
   override def streamBinary(data: T): Stream[IO, Byte] = {
     val enc: BinaryEncoder = new BinaryEncoder(DataCodec.hapiCodec)
-    enc.encode(data)
+    // Apply type conversion then encode.
+    // This should be consistent with the HapiService.filteredCatalog.
+    enc.encode(data.withOperation(new ConvertHapiTypes()))
   }
 
   override def streamJson(data: T, header: JsonObject): Stream[IO, Byte] = {
@@ -191,14 +194,15 @@ class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
   )
 
   // This is for things other than Time, which is handled elsewhere.
-  private def toDataType(tyname: String): Option[DataType] = tyname match {
-    case "string"  => HString.some
-    case "double"  => HDouble.some
-    case "float"   => HDouble.some
-    case "int"     => HInteger.some
-    case "short"   => HInteger.some
-    case "long"    => HInteger.some
-    case _         => None
+  // This needs to be consistent with the HapiService.filteredCatalog
+  // and the ConvertHapiTypes operation.
+  private def toDataType(vtype: ValueType): Option[DataType] = vtype match {
+    case StringValueType => HString.some
+    case DoubleValueType => HDouble.some
+    case FloatValueType  => HDouble.some
+    case IntValueType    => HInteger.some
+    case ShortValueType  => HInteger.some
+    case _               => None
   }
 
   private def makeProjection(params: Option[NonEmptyList[String]]): List[UnaryOperation] =
