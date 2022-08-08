@@ -20,7 +20,7 @@ final case class Parameter(
   name: String,
   dType: DataType,
   length: Option[Int],
-  units: String,
+  units: Option[String],
   size: Option[List[Int]],
   fill: Option[String],
   description: Option[String],
@@ -32,15 +32,16 @@ object Parameter {
   /**
    * JSON encoder
    *
-   * This encoder will drop parameters that are None except for fill,
-   * which is always required.
+   * This encoder will drop parameters that are None except for
+   * units and fill, which are always required.
    */
   implicit val encoder: Encoder[Parameter] =
     deriveEncoder[Parameter].mapJsonObject { obj =>
       JsonObject.fromIterable {
         obj.toList.filter {
-          case ("fill", _) => true
-          case (_, v)      => !v.isNull
+          case ("units", _) => true
+          case ("fill", _)  => true
+          case (_, v)       => !v.isNull
         }.map {
           case ("dType", v) => ("type", v)
           case x            => x

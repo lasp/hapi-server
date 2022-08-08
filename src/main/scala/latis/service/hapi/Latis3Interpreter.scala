@@ -14,8 +14,14 @@ import io.circe.Json
 import io.circe.JsonObject
 
 import latis.catalog.Catalog
+import latis.model.DoubleValueType
+import latis.model.FloatValueType
 import latis.model.Function
+import latis.model.IntValueType
 import latis.model.Scalar
+import latis.model.ShortValueType
+import latis.model.StringValueType
+import latis.model.ValueType
 import latis.ops.ConvertHapiTypes
 import latis.ops.Projection
 import latis.ops.Selection
@@ -159,23 +165,15 @@ class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
     }
 
   private def getScalarMetadata(s: Scalar): Either[InfoError, Parameter] = for {
-    tyName <- Either.fromOption(
-      s.metadata.getProperty("type"),
-      MetadataError("Parameter missing metadata property 'type'")
-    )
-    ty     <- Either.fromOption(
-      toDataType(tyName),
+    ty <- Either.fromOption(
+      toDataType(s.valueType),
       MetadataError("Parameter has unsupported value for metadata property 'type'")
-    )
-    units  <- Either.fromOption(
-      s.metadata.getProperty("units"),
-      MetadataError("Parameter missing metadata property 'units'")
     )
   } yield Parameter(
     s.id.asString,
     ty,
     None,
-    units,
+    s.units,
     None,
     s.metadata.getProperty("missing_value"),
     s.metadata.getProperty("description"),
@@ -186,7 +184,7 @@ class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
     "time",
     HIsoTime,
     Option(24),
-    "UTC",
+    "UTC".some,
     None,
     dt.metadata.getProperty("missing_value"),
     dt.metadata.getProperty("description"),
