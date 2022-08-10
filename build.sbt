@@ -3,7 +3,8 @@ ThisBuild / scalaVersion := "2.13.8"
 
 val fs2DataVersion = "1.5.0"
 val http4sVersion = "0.23.14"
-val latisVersion = "a626466"
+val latisVersion = "fd8e35d"
+val latisHapiVersion = "9d1e6f9"
 
 lazy val root = (project in file("."))
   .settings(
@@ -13,10 +14,10 @@ lazy val root = (project in file("."))
       "com.github.latis-data.latis3" %% "latis3-service-interface" % latisVersion,
       "com.github.latis-data.latis3" %% "latis3-server"            % latisVersion,
       "com.github.latis-data.latis3" %% "dap2-service-interface"   % latisVersion,
-      "com.github.latis-data"         % "latis3-hapi"              % "1d52ef7",
+      "com.github.latis-data"         % "latis3-hapi"              % latisHapiVersion,
       "org.http4s"                   %% "http4s-dsl"               % http4sVersion % Provided,
       "org.http4s"                   %% "http4s-circe"             % http4sVersion,
-      "org.http4s"                   %% "http4s-scalatags"         % "0.23.11",
+      "org.http4s"                   %% "http4s-scalatags"         % "0.24.0",
       "org.scalameta"                %% "munit"                    % "0.7.29" % Test,
       "org.typelevel"                %% "munit-cats-effect-3"      % "1.0.7" % Test,
       "io.circe"                     %% "circe-generic"            % "0.14.2",
