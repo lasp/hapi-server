@@ -3,8 +3,8 @@ ThisBuild / scalaVersion := "2.13.8"
 
 val fs2DataVersion = "1.5.0"
 val http4sVersion = "0.23.15"
-val latisVersion = "fd8e35d"
-val latisHapiVersion = "9d1e6f9"
+val latisVersion = "de6724b"
+val latisHapiVersion = "55f5bb2"
 
 lazy val root = (project in file("."))
   .settings(
