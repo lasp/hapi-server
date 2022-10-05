@@ -3,7 +3,7 @@ ThisBuild / scalaVersion := "2.13.8"
 
 val fs2DataVersion = "1.5.0"
 val http4sVersion = "0.23.15"
-val latisVersion = "de6724b"
+val latisVersion = "49a8367"
 val latisHapiVersion = "55f5bb2"
 
 lazy val root = (project in file("."))
@@ -23,7 +23,7 @@ lazy val root = (project in file("."))
       "io.circe"                     %% "circe-generic"            % "0.14.2",
       // coursier only seems to include compile dependencies when
       // building a standalone executable (see coursier/coursier#552)
-      "ch.qos.logback"                % "logback-classic"          % "1.2.8",
+      "ch.qos.logback"                % "logback-classic"          % "1.3.1" % Test,
       "org.gnieh"                    %% "fs2-data-json"            % fs2DataVersion,
       "org.gnieh"                    %% "fs2-data-json-circe"      % fs2DataVersion
     ),
