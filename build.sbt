@@ -1,8 +1,8 @@
 ThisBuild / organization := "io.latis-data"
-ThisBuild / scalaVersion := "2.13.8"
+ThisBuild / scalaVersion := "2.13.10"
 
 val fs2DataVersion = "1.5.0"
-val http4sVersion = "0.23.15"
+val http4sVersion = "0.23.16"
 val latisVersion = "49a8367"
 val latisHapiVersion = "55f5bb2"
 
@@ -20,10 +20,10 @@ lazy val root = (project in file("."))
       "org.http4s"                   %% "http4s-scalatags"         % "0.24.0",
       "org.scalameta"                %% "munit"                    % "0.7.29" % Test,
       "org.typelevel"                %% "munit-cats-effect-3"      % "1.0.7" % Test,
-      "io.circe"                     %% "circe-generic"            % "0.14.2",
+      "io.circe"                     %% "circe-generic"            % "0.14.3",
       // coursier only seems to include compile dependencies when
       // building a standalone executable (see coursier/coursier#552)
-      "ch.qos.logback"                % "logback-classic"          % "1.3.1" % Test,
+      "ch.qos.logback"                % "logback-classic"          % "1.3.4" % Test,
       "org.gnieh"                    %% "fs2-data-json"            % fs2DataVersion,
       "org.gnieh"                    %% "fs2-data-json-circe"      % fs2DataVersion
     ),
