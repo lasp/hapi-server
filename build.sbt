@@ -6,7 +6,6 @@ val pureconfigVersion = "0.13.0"
 
 lazy val `hapi-server` = (project in file("."))
   .enablePlugins(DockerPlugin)
-  .dependsOn(latis2)
   .settings(compilerFlags)
   .settings(dockerSettings)
   .settings(assemblySettings)
@@ -21,15 +20,12 @@ lazy val `hapi-server` = (project in file("."))
       "ch.qos.logback"         % "logback-classic"        % "1.2.3" % Runtime,
       "com.github.pureconfig" %% "pureconfig"             % pureconfigVersion,
       "com.github.pureconfig" %% "pureconfig-cats-effect" % pureconfigVersion,
-      "org.scalatest"         %% "scalatest"              % "3.0.5" % Test
+      "org.scalatest"         %% "scalatest"              % "3.0.5" % Test,
+      "com.github.latis-data"  % "latis"                  % "3cc53a58bb"
     ),
-    Test / logBuffered := false
+    Test / logBuffered := false,
+    resolvers += "jitpack" at "https://jitpack.io"
   )
-
-lazy val latis2 = ProjectRef(
-  uri("git://github.com/latis-data/latis.git#3cc53a58bb870336e5eb5aec08ccf1fa37ef5f3a"),
-  "latis"
-)
 
 lazy val compilerFlags = Seq(
   scalacOptions ++= Seq(
