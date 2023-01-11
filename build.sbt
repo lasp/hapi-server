@@ -17,7 +17,7 @@ lazy val root = (project in file("."))
       "com.github.latis-data"         % "latis3-hapi"              % latisHapiVersion,
       "org.http4s"                   %% "http4s-dsl"               % http4sVersion % Provided,
       "org.http4s"                   %% "http4s-circe"             % http4sVersion,
-      "org.http4s"                   %% "http4s-scalatags"         % "0.25.1",
+      "org.http4s"                   %% "http4s-scalatags"         % "0.25.2",
       "org.scalameta"                %% "munit"                    % "0.7.29" % Test,
       "org.typelevel"                %% "munit-cats-effect-3"      % "1.0.7" % Test,
       "io.circe"                     %% "circe-generic"            % "0.14.3",
