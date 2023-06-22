@@ -7,6 +7,7 @@ import org.http4s.HttpRoutes
 import latis.catalog.Catalog
 import latis.metadata.Metadata
 import latis.model.Function
+import latis.ops.OperationRegistry
 import latis.time.Time
 
 // TODO: Would this be better in latis.service?
@@ -27,7 +28,7 @@ import latis.server.ServiceInterface
  * together those five endpoints and a landing page and exposes them
  * as a single service that implements the HAPI spec.
  */
-class HapiService(catalog: Catalog) extends ServiceInterface(catalog) {
+class HapiService(catalog: Catalog) extends ServiceInterface(catalog, OperationRegistry.empty) {
 
   // The catalog provided by LaTiS contains datasets that cannot be
   // represented with HAPI, so we filter those datasets out.
