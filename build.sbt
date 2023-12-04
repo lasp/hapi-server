@@ -23,7 +23,7 @@ lazy val root = (project in file("."))
       "io.circe"                     %% "circe-generic"            % "0.14.6",
       // coursier only seems to include compile dependencies when
       // building a standalone executable (see coursier/coursier#552)
-      "ch.qos.logback"                % "logback-classic"          % "1.3.13" % Test,
+      "ch.qos.logback"                % "logback-classic"          % "1.3.14" % Test,
       "org.gnieh"                    %% "fs2-data-json"            % fs2DataVersion,
       "org.gnieh"                    %% "fs2-data-json-circe"      % fs2DataVersion
     ),
