@@ -16,7 +16,7 @@ object HapiError {
     HapiError(HapiService.version, status)
 
   /** JSON encoder */
-  implicit val encoder: Encoder[HapiError] =
+  given encoder: Encoder[HapiError] =
     Encoder.forProduct2("HAPI", "status") { x =>
       (x.version, x.status)
     }

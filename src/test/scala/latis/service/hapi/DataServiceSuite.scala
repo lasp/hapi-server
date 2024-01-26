@@ -2,15 +2,15 @@ package latis.service.hapi
 
 import cats.data.NonEmptyList
 import cats.effect.IO
-import cats.syntax.all._
+import cats.syntax.all.*
 import io.circe.Json
-import io.circe.syntax._
+import io.circe.syntax.*
 import munit.CatsEffectSuite
-import org.http4s._
-import org.http4s.circe._
+import org.http4s.*
+import org.http4s.circe.*
 import org.http4s.headers.`Content-Type`
-import org.http4s.implicits._
-import org.http4s.{Status => _}
+import org.http4s.implicits.*
+import org.http4s.{Status as _}
 import scodec.codecs
 
 import latis.catalog.Catalog
@@ -20,12 +20,12 @@ import latis.data.Sample
 import latis.data.SeqFunction
 import latis.dataset.MemoizedDataset
 import latis.metadata.Metadata
-import latis.model._
-import latis.service.hapi.HapiError._
+import latis.model.*
+import latis.service.hapi.HapiError.*
 import latis.service.hapi.HapiInterpreter.noopInterpreter
-import latis.service.hapi.{Status => HStatus}
+import latis.service.hapi.{Status as HStatus}
 import latis.time.Time
-import latis.util.Identifier._
+import latis.util.Identifier.*
 
 class DataServiceSuite extends CatsEffectSuite {
 
@@ -63,7 +63,7 @@ class DataServiceSuite extends CatsEffectSuite {
   private lazy val dataService = new DataService[IO](latisInterp).service
 
   /** Assert GET request to given URI returns a particular status. */
-  def assertStatus(uri: Uri, status: HStatus)(implicit loc: munit.Location): IO[Unit] = {
+  def assertStatus(uri: Uri, status: HStatus)(using loc: munit.Location): IO[Unit] = {
     val service = new DataService[IO](noopInterpreter).service
     val req = Request[IO](Method.GET, uri)
 
@@ -73,7 +73,7 @@ class DataServiceSuite extends CatsEffectSuite {
   }
 
   /** Assert the CSV decoder rejects the argument. */
-  def csvDecoderReject(arg: String)(implicit loc: munit.Location): Unit =
+  def csvDecoderReject(arg: String)(using loc: munit.Location): Unit =
     QueryDecoders.csvDecoder[String].decode(QueryParameterValue(arg))
       .fold(_ => assert(cond = true), _ => fail(s"Accepted bad input: '$arg'"))
 
@@ -219,7 +219,7 @@ class DataServiceSuite extends CatsEffectSuite {
     val req = Request[IO](Method.GET, uri"/data?dataset=testdataset&start=2000-01-01&stop=2000-01-06&format=binary")
     val resp = dataService.orNotFound(req)
 
-    val encoder = codecs.list(codecs.utf8 ~ codecs.int32L)
+    val encoder = codecs.list(codecs.utf8 :: codecs.int32L)
     val testBin = encoder.encode(
       List(
         ("2000-01-01T00:00:00.000Z", 1),

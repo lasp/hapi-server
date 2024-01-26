@@ -2,7 +2,7 @@ package latis.service.hapi
 
 import cats.data.NonEmptyList
 import io.circe.Encoder
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto.*
 
 /**
  * Represents metadata for HAPI datasets.
@@ -44,7 +44,7 @@ object Metadata {
    *
    * This encoder will drop parameters that are None.
    */
-  implicit val encoder: Encoder[Metadata] =
+  given encoder: Encoder[Metadata] =
     deriveEncoder[Metadata].mapJsonObject {
       _.filter {
         case (_, v) => !v.isNull

@@ -18,7 +18,7 @@ final case class Capabilities(
 object Capabilities {
 
   /** JSON encoder */
-  implicit val encoder: Encoder[Capabilities] =
+  given encoder: Encoder[Capabilities] =
     Encoder.forProduct3("HAPI", "status", "outputFormats") { x =>
       (x.version, x.status, x.formats)
     }

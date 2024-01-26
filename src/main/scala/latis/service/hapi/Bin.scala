@@ -1,7 +1,7 @@
 package latis.service.hapi
 
 import io.circe.Encoder
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto.*
 
 /**
  * Represents a parameter's bin.
@@ -25,13 +25,13 @@ final case class Bin(
 object Bin {
 
   /** JSON encoder */
-  implicit val encoder: Encoder[Bin] =
+  given encoder: Encoder[Bin] =
     deriveEncoder[Bin].mapJsonObject { obj =>
       obj.filter {
         case ("centers", _) =>
           // Keep "centers" regardless of its value if "ranges" is
           // null or missing.
-          obj("ranges").map(_.isNull).getOrElse(true)
+          obj("ranges").forall(_.isNull)
         case (_, v)         =>
           // Remove all other null fields.
           !v.isNull

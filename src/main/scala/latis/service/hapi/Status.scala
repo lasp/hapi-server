@@ -23,7 +23,7 @@ object Status {
   val `1501`: Status = Status(1501, "Internal server error - upstream request error")
 
   /** JSON encoder */
-  implicit val encoder: Encoder[Status] =
+  given encoder: Encoder[Status] =
     Encoder.forProduct2("code", "message") { x =>
       (x.code, x.message)
     }

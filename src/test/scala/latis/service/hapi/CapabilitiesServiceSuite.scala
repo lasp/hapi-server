@@ -1,12 +1,12 @@
 package latis.service.hapi
 
 import cats.effect.IO
-import io.circe._
-import io.circe.syntax._
+import io.circe.*
+import io.circe.syntax.*
 import munit.CatsEffectSuite
-import org.http4s._
-import org.http4s.circe._
-import org.http4s.implicits._
+import org.http4s.*
+import org.http4s.circe.*
+import org.http4s.implicits.*
 
 class CapabilitiesServiceSuite extends CatsEffectSuite {
 
