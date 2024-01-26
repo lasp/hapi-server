@@ -29,7 +29,7 @@ object Dataset {
     Dataset(id, id)
 
   /** JSON encoder */
-  implicit val encoder: Encoder[Dataset] =
+  given encoder: Encoder[Dataset] =
     Encoder.forProduct2("id", "title") { x =>
       (x.id, x.title)
     }

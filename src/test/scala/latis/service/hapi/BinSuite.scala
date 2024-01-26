@@ -1,7 +1,7 @@
 package latis.service.hapi
 
-import io.circe._
-import io.circe.syntax._
+import io.circe.*
+import io.circe.syntax.*
 import munit.FunSuite
 
 class BinSuite extends FunSuite {

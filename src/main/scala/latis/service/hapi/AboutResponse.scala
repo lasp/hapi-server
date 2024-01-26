@@ -28,7 +28,7 @@ final case class AboutResponse(
 object AboutResponse {
 
   /** JSON encoder */
-  implicit val encoder: Encoder[AboutResponse] =
+  given encoder: Encoder[AboutResponse] =
     Encoder.forProduct8(
       "version",
       "status",
