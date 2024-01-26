@@ -3,7 +3,7 @@ package latis.service.hapi
 import cats.Applicative
 import cats.data.EitherT
 import cats.data.NonEmptyList
-import cats.implicits._
+import cats.implicits.*
 import fs2.Stream
 import io.circe.JsonObject
 

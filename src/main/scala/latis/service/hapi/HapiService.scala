@@ -1,7 +1,7 @@
 package latis.service.hapi
 
 import cats.effect.IO
-import cats.implicits._
+import cats.implicits.*
 import org.http4s.HttpRoutes
 
 import latis.catalog.Catalog

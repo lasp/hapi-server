@@ -1,8 +1,8 @@
 package latis.util
 
-import cats.syntax.all._
+import cats.syntax.all.*
 
-import latis.service.hapi._
+import latis.service.hapi.*
 import latis.time.TimeFormat
 
 object HapiUtils {

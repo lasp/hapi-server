@@ -8,7 +8,7 @@ class TimeParseSuite extends FunSuite {
 
   val expected = LocalDateTime.of(2018, 1, 1, 0, 0, 0)
 
-  def testParse(str: String)(implicit loc: munit.Location): Unit =
+  def testParse(str: String)(using loc: munit.Location): Unit =
     Time.parse(str) match {
       case Some(t) => assertEquals(t, expected)
       case None => fail(s"Failed to parse time string: $str")

@@ -2,10 +2,10 @@ package latis.service.hapi
 
 import munit.CatsEffectSuite
 
-import latis.data._
+import latis.data.*
 import latis.dataset.MemoizedDataset
 import latis.metadata.Metadata
-import latis.model._
+import latis.model.*
 import latis.ops.ToHapiTime
 import latis.time.Time
 

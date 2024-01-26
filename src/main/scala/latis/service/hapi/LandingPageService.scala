@@ -1,12 +1,12 @@
 package latis.service.hapi
 
 import cats.Monad
-import cats.syntax.all._
+import cats.syntax.all.*
 import org.http4s.HttpRoutes
 import org.http4s.dsl.Http4sDsl
-import org.http4s.scalatags._
+import org.http4s.scalatags.*
 import scalatags.Text
-import scalatags.Text.all._
+import scalatags.Text.all.*
 
 /** Implements the HAPI landing page. */
 class LandingPageService[F[_]: Monad](alg: CatalogAlgebra[F]) extends Http4sDsl[F] {

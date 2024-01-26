@@ -1,10 +1,10 @@
 package latis.service.hapi
 
 import cats.effect.Concurrent
-import cats.implicits._
-import io.circe.syntax._
+import cats.implicits.*
+import io.circe.syntax.*
 import org.http4s.HttpRoutes
-import org.http4s.circe._
+import org.http4s.circe.*
 import org.http4s.dsl.Http4sDsl
 
 /**

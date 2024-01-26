@@ -2,7 +2,7 @@ package latis.service.hapi
 
 import io.circe.Encoder
 import io.circe.Json
-import io.circe.syntax._
+import io.circe.syntax.*
 
 /**
  * Represents a response from the `info` service.
@@ -24,7 +24,7 @@ object InfoResponse {
    *
    * Note that we are flattening out the `metadata` field.
    */
-  implicit val encoder: Encoder[InfoResponse] =
+  given encoder: Encoder[InfoResponse] =
     new Encoder[InfoResponse] {
       override def apply(x: InfoResponse): Json =
         Encoder[Metadata].apply(x.metadata).deepMerge(

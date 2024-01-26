@@ -2,7 +2,7 @@ package latis.service.hapi
 
 import io.circe.Encoder
 import io.circe.JsonObject
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto.*
 
 /**
  * Represents a parameter in a HAPI dataset.
@@ -35,7 +35,7 @@ object Parameter {
    * This encoder will drop parameters that are None except for
    * units and fill, which are always required.
    */
-  implicit val encoder: Encoder[Parameter] =
+  given encoder: Encoder[Parameter] =
     deriveEncoder[Parameter].mapJsonObject { obj =>
       JsonObject.fromIterable {
         obj.toList.filter {
