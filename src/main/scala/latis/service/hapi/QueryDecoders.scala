@@ -12,7 +12,6 @@ import org.http4s.dsl.io.*
 /** Shared query decoders and matchers. */
 object QueryDecoders {
 
-
   object DatasetMatcher extends OptionalQueryParamDecoderMatcher[String]("dataset")
   object StartTimeMatcher extends OptionalValidatingQueryParamDecoderMatcher[LocalDateTime]("start")
   object StopTimeMatcher extends OptionalValidatingQueryParamDecoderMatcher[LocalDateTime]("stop")

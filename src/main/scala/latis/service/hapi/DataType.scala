@@ -19,7 +19,7 @@ case object HInteger extends DataType
 case object HIsoTime extends DataType
 
 object DataType {
-  
+
   /** JSON encoder */
   given encoder: Encoder[DataType] =
     Encoder.instance {

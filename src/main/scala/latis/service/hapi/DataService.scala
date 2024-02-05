@@ -6,7 +6,7 @@ import cats.effect.Concurrent
 import cats.implicits.*
 import fs2.Stream
 import io.circe.syntax.*
-import org.http4s.{Status => _, _}
+import org.http4s.{Status as _, *}
 import org.http4s.circe.*
 import org.http4s.dsl.Http4sDsl
 import org.http4s.headers.`Content-Type`
