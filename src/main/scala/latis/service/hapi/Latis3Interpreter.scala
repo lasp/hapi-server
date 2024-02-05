@@ -30,7 +30,7 @@ import latis.ops.UnaryOperation
 import latis.output.BinaryEncoder
 import latis.output.CsvEncoder
 import latis.output.JsonEncoder
-import latis.time.{Time => LTime}
+import latis.time.{Time as LTime}
 import latis.util.HapiUtils.*
 import latis.util.Identifier
 import latis.util.Identifier.*

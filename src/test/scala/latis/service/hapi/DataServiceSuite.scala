@@ -10,7 +10,7 @@ import org.http4s.*
 import org.http4s.circe.*
 import org.http4s.headers.`Content-Type`
 import org.http4s.implicits.*
-import org.http4s.{Status => _}
+import org.http4s.{Status as _}
 import scodec.codecs
 
 import latis.catalog.Catalog
@@ -23,7 +23,7 @@ import latis.metadata.Metadata
 import latis.model.*
 import latis.service.hapi.HapiError.*
 import latis.service.hapi.HapiInterpreter.noopInterpreter
-import latis.service.hapi.{Status => HStatus}
+import latis.service.hapi.{Status as HStatus}
 import latis.time.Time
 import latis.util.Identifier.*
 
