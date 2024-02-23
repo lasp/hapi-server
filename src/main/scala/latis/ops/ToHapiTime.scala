@@ -1,9 +1,9 @@
 package latis.ops
 
-import cats.implicits._
+import cats.implicits.*
 
 import latis.data.Sample
-import latis.model._
+import latis.model.*
 import latis.time.Time
 import latis.time.TimeFormat
 import latis.util.LatisException

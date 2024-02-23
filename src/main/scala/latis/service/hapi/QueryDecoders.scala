@@ -3,15 +3,14 @@ package latis.service.hapi
 import java.time.LocalDateTime
 
 import cats.data.NonEmptyList
-import cats.implicits._
+import cats.implicits.*
 import org.http4s.ParseFailure
 import org.http4s.QueryParamDecoder
 import org.http4s.QueryParameterValue
-import org.http4s.dsl.io._
+import org.http4s.dsl.io.*
 
 /** Shared query decoders and matchers. */
 object QueryDecoders {
-
 
   object DatasetMatcher extends OptionalQueryParamDecoderMatcher[String]("dataset")
   object StartTimeMatcher extends OptionalValidatingQueryParamDecoderMatcher[LocalDateTime]("start")
@@ -24,7 +23,7 @@ object QueryDecoders {
   object ParamMatcher extends OptionalQueryParamDecoderMatcher[NonEmptyList[String]]("parameters")
 
   /** Decoder for non-empty simple CSV query parameters. */
-  implicit def csvDecoder[A : QueryParamDecoder]: QueryParamDecoder[NonEmptyList[A]] =
+  given csvDecoder[A : QueryParamDecoder]: QueryParamDecoder[NonEmptyList[A]] =
     new QueryParamDecoder[NonEmptyList[A]] {
       override def decode(qpv: QueryParameterValue) =
         if (qpv.value.isEmpty) {
@@ -47,7 +46,7 @@ object QueryDecoders {
     }
 
   /** Decoder for restricted ISO 8601 time strings. */
-  implicit val restrictedISO8601: QueryParamDecoder[LocalDateTime] =
+  given restrictedISO8601: QueryParamDecoder[LocalDateTime] =
     new QueryParamDecoder[LocalDateTime] {
       override def decode(qpv: QueryParameterValue) =
         Time.parse(qpv.value).toValidNel(

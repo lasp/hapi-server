@@ -5,7 +5,7 @@ import scala.collection.immutable.ListMap
 import cats.data.EitherT
 import cats.data.NonEmptyList
 import cats.effect.IO
-import cats.implicits._
+import cats.implicits.*
 import fs2.Stream
 import fs2.data.json
 import fs2.data.json.circe.tokenizerForEncoder
@@ -30,11 +30,11 @@ import latis.ops.UnaryOperation
 import latis.output.BinaryEncoder
 import latis.output.CsvEncoder
 import latis.output.JsonEncoder
-import latis.time.{Time => LTime}
-import latis.util.HapiUtils._
+import latis.time.{Time as LTime}
+import latis.util.HapiUtils.*
 import latis.util.Identifier
-import latis.util.Identifier.IdentifierStringContext
-import latis.util.dap2.parser.ast._
+import latis.util.Identifier.*
+import latis.util.dap2.parser.ast.*
 import latis.util.hapi.DataCodec
 
 class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
@@ -67,7 +67,7 @@ class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
       // This would indicate that the parameter wasn't found, so we
       // should return an error.
       missing   = params.flatMap(_.find(! hasVariable(dataset, _)))
-      _        <- EitherT.fromOption[IO](missing.map(UnknownParam), ()).swap
+      _        <- EitherT.fromOption[IO](missing.map(UnknownParam.apply), ()).swap
       // Get the metadata.
       metadata <- EitherT.fromEither[IO](getDatasetMetadata(dataset))
     } yield params.map { ps =>

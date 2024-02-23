@@ -7,16 +7,16 @@ import io.circe.Json
 sealed trait TimeStampLocation
 
 /** Time stamp at the beginning of the window. */
-final case object Begin extends TimeStampLocation
+case object Begin extends TimeStampLocation
 
 /** Time stamp at the center of the window. */
-final case object Center extends TimeStampLocation
+case object Center extends TimeStampLocation
 
 /** Time stamp at the end of the window. */
-final case object End extends TimeStampLocation
+case object End extends TimeStampLocation
 
 /** Time stamp elsewhere in window or unknown. */
-final case object Other extends TimeStampLocation
+case object Other extends TimeStampLocation
 
 object TimeStampLocation {
 
@@ -30,11 +30,11 @@ object TimeStampLocation {
     }
 
   /** JSON encoder */
-  implicit val encoder: Encoder[TimeStampLocation] =
+  given encoder: Encoder[TimeStampLocation] =
     Encoder.instance {
-      case Begin  => Json.fromString("begin")
+      case Begin => Json.fromString("begin")
       case Center => Json.fromString("center")
-      case End    => Json.fromString("end")
-      case Other  => Json.fromString("other")
+      case End => Json.fromString("end")
+      case Other => Json.fromString("other")
     }
 }

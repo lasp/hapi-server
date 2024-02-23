@@ -3,22 +3,22 @@ package latis.service.hapi
 import cats.data.EitherT
 import cats.data.NonEmptyList
 import cats.effect.Concurrent
-import cats.implicits._
+import cats.implicits.*
 import fs2.Stream
-import io.circe.syntax._
-import org.http4s.{Status => _, _}
-import org.http4s.circe._
+import io.circe.syntax.*
+import org.http4s.{Status as _, *}
+import org.http4s.circe.*
 import org.http4s.dsl.Http4sDsl
 import org.http4s.headers.`Content-Type`
-import org.log4s._
+import org.log4s.*
 
 /** Implements the `/data` endpoint. */
 class DataService[F[_]: Concurrent](
   alg: DataAlgebra[F] with InfoAlgebra[F]
 ) extends Http4sDsl[F] {
-  import Format._
-  import Include._
-  import QueryDecoders._
+  import Format.*
+  import Include.*
+  import QueryDecoders.*
 
   private[this] val logger = getLogger
 

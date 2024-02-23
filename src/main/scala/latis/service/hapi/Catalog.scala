@@ -18,7 +18,7 @@ final case class Catalog(
 object Catalog {
 
   /** JSON encoder */
-  implicit val encoder: Encoder[Catalog] =
+  given encoder: Encoder[Catalog] =
     Encoder.forProduct3("HAPI", "status", "catalog") { x =>
       (x.version, x.status, x.catalog)
     }
