@@ -1,10 +1,10 @@
 ThisBuild / organization := "io.latis-data"
-ThisBuild / scalaVersion := "3.3.1"
+ThisBuild / scalaVersion := "3.3.3"
 
 val fs2DataVersion = "1.8.1"
-val http4sVersion = "0.23.25"
-val latisVersion  = "4abcef6" //TODO: update when latis3's scala-3 branch is merged
-val latisHapiVersion = "3e21c35" //TODO: update when latis3-hapi's scala-3 branch is merged
+val http4sVersion = "0.23.27"
+val latisVersion  = "792d62ed"
+val latisHapiVersion = "d70da0a5"
 
 lazy val root = (project in file("."))
   .settings(
