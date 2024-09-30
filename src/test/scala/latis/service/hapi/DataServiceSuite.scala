@@ -21,7 +21,6 @@ import latis.data.SeqFunction
 import latis.dataset.MemoizedDataset
 import latis.metadata.Metadata
 import latis.model.*
-import latis.service.hapi.HapiError.*
 import latis.service.hapi.HapiInterpreter.noopInterpreter
 import latis.service.hapi.{Status as HStatus}
 import latis.time.Time
