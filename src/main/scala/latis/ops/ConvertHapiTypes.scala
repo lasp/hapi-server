@@ -27,6 +27,7 @@ class ConvertHapiTypes extends MapOperation {
 
   private def convertValue(data: Data): Data = data match {
     case v: ShortValue => IntValue(v.value.toInt)
+    case v: LongValue  => IntValue(v.value.toInt) //TODO: risk of overflow
     case v: FloatValue => DoubleValue(v.value.toDouble)
     case _             => data //no-op, shouldn't get here due to catalog filter
   }
@@ -42,6 +43,10 @@ class ConvertHapiTypes extends MapOperation {
         scalar.metadata + ("type" -> "double")
       ).fold(throw _, identity) //should not fail
     case ShortValueType =>
+      Scalar.fromMetadata(
+        scalar.metadata + ("type" -> "int")
+      ).fold(throw _, identity) //should not fail
+    case LongValueType =>
       Scalar.fromMetadata(
         scalar.metadata + ("type" -> "int")
       ).fold(throw _, identity) //should not fail

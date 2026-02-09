@@ -50,6 +50,7 @@ class HapiService(catalog: Catalog) extends ServiceInterface(catalog, OperationR
       case "string" => md.getProperty("size").isDefined
       case "double" => true
       case "int"    => true
+      case "long"   => true
       case "float"  => true //may be converted to double by ConvertHapiTypes
       case "short"  => true //may be converted to int by ConvertHapiTypes
       case _        => false
