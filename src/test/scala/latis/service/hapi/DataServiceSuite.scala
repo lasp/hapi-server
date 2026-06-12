@@ -10,7 +10,6 @@ import org.http4s.*
 import org.http4s.circe.*
 import org.http4s.headers.`Content-Type`
 import org.http4s.implicits.*
-import org.http4s.{Status as _}
 import scodec.codecs
 
 import latis.catalog.Catalog
