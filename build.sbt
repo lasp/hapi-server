@@ -28,7 +28,7 @@ lazy val root = (project in file("."))
       "org.gnieh"                    %% "fs2-data-json-circe"      % fs2DataVersion
     ),
     resolvers ++= Seq(
-      "Unidata" at "https://artifacts.unidata.ucar.edu/repository/unidata-all",
+      "Unidata" at "https://artifacts.unidata.ucar.edu/repository/unidata-releases",
       "jitpack" at "https://jitpack.io"
     ),
     reStart / mainClass := Some("latis.server.Latis3Server"),
