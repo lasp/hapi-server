@@ -42,7 +42,7 @@ class HapiService(catalog: Catalog) extends ServiceInterface(catalog, OperationR
   // This checks that:
   // - The Dataset metadata has temporalCoverage
   // - The single domain variable is of type Time
-  // - Each scalar in the range has a supported type
+  // - Each scalar in the range has a supported or convertible type
   // - If the type of a scalar is string, its size is defined
   private val filteredCatalog: Catalog = {
     val covP:  Metadata => Boolean = _.getProperty("temporalCoverage").isDefined
@@ -50,8 +50,9 @@ class HapiService(catalog: Catalog) extends ServiceInterface(catalog, OperationR
       case "string" => md.getProperty("size").isDefined
       case "double" => true
       case "int"    => true
-      case "float"  => true //may be converted to double by ConvertHapiTypes
-      case "short"  => true //may be converted to int by ConvertHapiTypes
+      case "long"   => true //converted to int by ConvertHapiTypes
+      case "float"  => true //converted to double by ConvertHapiTypes
+      case "short"  => true //converted to int by ConvertHapiTypes
       case _        => false
     }
 
