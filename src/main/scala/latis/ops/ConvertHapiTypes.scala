@@ -10,29 +10,38 @@ import latis.util.LatisException
 /**
  * Converts scalar values to be consistent with supported HAPI types.
  *
- * HAPI supports only double, int, and string types. This will convert
- * some types that can safely be converted. Longs are an exception.
- * Although HAPI does not support 64-bit integers, they are common enough
- * in data sources that they are converted to 32-bit integers here at
- * the risk of integer overflow (wrapped to negative numbers, not an error).
+ * HAPI supports only doubles, 32-bit integers, and string types.
+ * This will convert LaTiS types that can safely be converted. Longs
+ * are an exception. Although HAPI does not support 64-bit integers,
+ * they are common enough in data sources that this attempts to convert
+ * long values to 32-bit integers. If the long value exceeds the max Int,
+ * a fill value will be used if defined for that variable. Otherwise, an
+ * overflow exception will be thrown.
+ *
  * Datasets with other types will be excluded from the Catalog by
  * HapiService.filteredCatalog. This operation needs to be consistent
  * with that filter.
  *
  * This assumes flat datasets with no nesting.
  *
- * This is only needed for the binary output.
+ * This is only needed for the binary output, so it is otherwise not
+ * applicable.
  */
 class ConvertHapiTypes extends MapOperation {
 
   def mapFunction(model: DataType): Sample => Sample = {
     // Note, domain can only be time and it is handled elsewhere
-    case Sample(d, r) => Sample(d, RangeData(r.map(convertValue)))
+    case Sample(d, r) =>
+      val rdata = model.getScalars.tail.zip(r).map(convertValue)
+      Sample(d, RangeData(rdata))
   }
 
-  private def convertValue(data: Data): Data = data match {
+  private def convertValue(scalar: Scalar, data: Data): Data = data match {
     case v: ShortValue => IntValue(v.value.toInt)
-    case v: LongValue  => IntValue(v.value.toInt) //risk of overflow but no exception
+    case v: LongValue  =>
+      if (v.value > Int.MaxValue.toLong)
+        scalar.fillValue.getOrElse(throw LatisException("Integer overflow"))
+      else IntValue(v.value.toInt)
     case v: FloatValue => DoubleValue(v.value.toDouble)
     case _             => data //no-op, shouldn't get here due to catalog filter
   }
