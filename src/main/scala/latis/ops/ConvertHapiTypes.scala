@@ -11,14 +11,19 @@ import latis.util.LatisException
  * Converts scalar values to be consistent with supported HAPI types.
  *
  * HAPI supports only double, int, and string types. This will convert
- * some types that can safely be converted. Datasets with other types
- * will be excluded from the Catalog by HapiService.filteredCatalog.
- * This operation needs to be consistent with that filter.
+ * some types that can safely be converted. Longs are an exception.
+ * Although HAPI does not support 64-bit integers, they are common enough
+ * in data sources that they are converted to 32-bit integers here at
+ * the risk of integer overflow (wrapped to negative numbers, not an error).
+ * Datasets with other types will be excluded from the Catalog by
+ * HapiService.filteredCatalog. This operation needs to be consistent
+ * with that filter.
+ *
+ * This assumes flat datasets with no nesting.
  *
  * This is only needed for the binary output.
  */
 class ConvertHapiTypes extends MapOperation {
-  //TODO: assumes non-nested functions or tuples
 
   def mapFunction(model: DataType): Sample => Sample = {
     // Note, domain can only be time and it is handled elsewhere
