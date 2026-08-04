@@ -44,13 +44,14 @@ class HapiService(catalog: Catalog) extends ServiceInterface(catalog, OperationR
   // - The single domain variable is of type Time
   // - Each scalar in the range has a supported or convertible type
   // - If the type of a scalar is string, its size is defined
+  // - If the type is "long" a fillValue must be defined
   private val filteredCatalog: Catalog = {
     val covP:  Metadata => Boolean = _.getProperty("temporalCoverage").isDefined
     val typeP: Metadata => Boolean = md => md.getProperty("type").exists {
       case "string" => md.getProperty("size").isDefined
       case "double" => true
       case "int"    => true
-      case "long"   => true //converted to int by ConvertHapiTypes
+      case "long"   => md.getProperty("fillValue").isDefined
       case "float"  => true //converted to double by ConvertHapiTypes
       case "short"  => true //converted to int by ConvertHapiTypes
       case _        => false
