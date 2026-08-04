@@ -13,10 +13,10 @@ import latis.util.LatisException
  * HAPI supports only doubles, 32-bit integers, and string types.
  * This will convert LaTiS types that can safely be converted. Longs
  * are an exception. Although HAPI does not support 64-bit integers,
- * they are common enough in data sources that this attempts to convert
- * long values to 32-bit integers. If the long value exceeds the max Int,
- * a fill value will be used if defined for that variable. Otherwise, an
- * overflow exception will be thrown.
+ * they are common enough in data sources (even when an int is sufficient)
+ * that this attempts to convert long values to 32-bit integers. If the
+ * long value exceeds the max Int, a fill value will be used if defined
+ * for that variable. Otherwise, an overflow exception will be thrown.
  *
  * Datasets with other types will be excluded from the Catalog by
  * HapiService.filteredCatalog. This operation needs to be consistent
