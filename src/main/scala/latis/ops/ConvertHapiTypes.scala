@@ -15,8 +15,8 @@ import latis.util.LatisException
  * are an exception. Although HAPI does not support 64-bit integers,
  * they are common enough in data sources (even when an int is sufficient)
  * that this attempts to convert long values to 32-bit integers. If the
- * long value exceeds the max Int, a fill value will be used if defined
- * for that variable. Otherwise, an overflow exception will be thrown.
+ * long value exceeds the range of an Int, a fill value will be used
+ * if defined for that variable. Otherwise, an exception will be thrown.
  *
  * Datasets with other types will be excluded from the Catalog by
  * HapiService.filteredCatalog. This operation needs to be consistent
@@ -39,7 +39,7 @@ class ConvertHapiTypes extends MapOperation {
   private def convertValue(scalar: Scalar, data: Data): Data = data match {
     case v: ShortValue => IntValue(v.value.toInt)
     case v: LongValue  =>
-      if (v.value > Int.MaxValue.toLong)
+      if (v.value > Int.MaxValue.toLong || v.value < Int.MinValue.toLong)
         scalar.fillValue.getOrElse(throw LatisException("Integer overflow"))
       else IntValue(v.value.toInt)
     case v: FloatValue => DoubleValue(v.value.toDouble)
