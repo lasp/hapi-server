@@ -20,7 +20,7 @@ lazy val root = (project in file("."))
       "org.http4s"                   %% "http4s-scalatags"         % "0.25.3",
       "org.scalameta"                %% "munit"                    % "1.3.6" % Test,
       "org.typelevel"                %% "munit-cats-effect"        % "2.2.1" % Test,
-      "io.circe"                     %% "circe-generic"            % "0.14.16",
+      "io.circe"                     %% "circe-generic"            % "0.14.17",
       // coursier only seems to include compile dependencies when
       // building a standalone executable (see coursier/coursier#552)
       "ch.qos.logback"                % "logback-classic"          % "1.3.16" % Test,
