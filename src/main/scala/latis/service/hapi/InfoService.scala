@@ -13,7 +13,7 @@ import org.log4s.*
 class InfoService[F[_]: Concurrent](alg: InfoAlgebra[F]) extends Http4sDsl[F] {
   import QueryDecoders.*
 
-  private[this] val logger = getLogger
+  private val logger = getLogger
 
   val service: HttpRoutes[F] =
     HttpRoutes.of[F] {

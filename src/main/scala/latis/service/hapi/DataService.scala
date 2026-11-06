@@ -14,13 +14,13 @@ import org.log4s.*
 
 /** Implements the `/data` endpoint. */
 class DataService[F[_]: Concurrent](
-  alg: DataAlgebra[F] with InfoAlgebra[F]
+  alg: DataAlgebra[F] & InfoAlgebra[F]
 ) extends Http4sDsl[F] {
   import Format.*
   import Include.*
   import QueryDecoders.*
 
-  private[this] val logger = getLogger
+  private val logger = getLogger
 
   private def req2Resp(req: DataRequest, _params:Option[NonEmptyList[String]]): EitherT[F, Status, Response[F]] = {
     val dataset = req.dataset

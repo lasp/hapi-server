@@ -108,7 +108,7 @@ class Latis3Interpreter(catalog: Catalog) extends HapiInterpreter[IO] {
   override def streamJson(data: T, header: JsonObject): Stream[IO, Byte] = {
     val dataJson = new JsonEncoder().encode(data)
     val headerList = header.add("format", Json.fromString("json")).toList
-    val map = ListMap(headerList: _*)
+    val map = ListMap(headerList*)
     dataJson
       .through(json.ast.tokenize)
       .through(json.wrap.asArrayInObject(at = "data", in = map))
